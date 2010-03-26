@@ -10,6 +10,7 @@ namespace tsubomi {
 
   class indexer {
     FILE         *fin_;
+    bool         is_close_;
     vector<long> sa_;
   public:
     indexer(FILE *fin);
@@ -50,8 +51,8 @@ namespace tsubomi {
   private:
     writer(const writer &);
     const writer &operator=(const writer &);
-    long write_little();
-    long write_big();
+    void write_little(long index);
+    void write_big(long index);
   };
 
   class comparer {
