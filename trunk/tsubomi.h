@@ -75,8 +75,8 @@ namespace tsubomi {
     }
   };
 
-  bool is_little_endian() {
-    i = 1;
+  inline bool is_little_endian() {
+    int i = 1;
     char *p = (char *)(&i);
     if (*p) { return true; }
     return false;
