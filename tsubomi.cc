@@ -39,7 +39,7 @@ namespace tsubomi {
   //////////////////////
   // PUBLIC FUNCTIONS //
   //////////////////////
-  void indexer::mkary(const char *seps = "") {
+  void indexer::mkary(const char *seps) {
     long offset = 0;
     int  ch     = '\0';
     this->sa_.clear();
@@ -79,7 +79,7 @@ namespace tsubomi {
     return this->sa_[index];
   }
 
-  void indexer::get_string(long index, char *buf, long size, const char *seps = "") {
+  void indexer::get_string(long index, char *buf, long size, const char *seps) {
     if (index < 0 || this->sa_.size() <= index) {
       throw "error at indexer::get_string(). index is out if range.";
     }
@@ -91,11 +91,12 @@ namespace tsubomi {
     while (i < size) {
       buf[i] = fgetc(this->fin_);
       if (buf[i] == EOF) { goto LOOP_END; }
-      for (int j = 0; seps[j] != '\0'; j++) { if (seps[j] == buf[i]) { goto LOOP_END; }
+      for (int j = 0; seps[j] != '\0'; j++) { if (seps[j] == buf[i]) { goto LOOP_END; } }
+      i++;
     }
 LOOP_END:
     buf[i] = '\0';
-    return
+    return;
   }
 
   void indexer::read(FILE *fin) {
@@ -119,10 +120,11 @@ LOOP_END:
       throw "error at indexer::compare2key(). fseek() failure.";
     }
     int ret = 0;
-    while (ret = 0) {
+    while (ret == 0) {
       ret = fgetc(this->fin_);
       if (ret == EOF) { return 1; } // key is greater
       ret = *key - ret;
+      key++;
       if (*key == '\0') { break; }
     }
     return ret;
@@ -158,7 +160,7 @@ LOOP_END:
     if (is_little_endian()) {
       long size = this->read_little();
       for (int i = 0; i < size; i++) { psa->push_back(this->read_little()); }
-    else {
+    } else {
       long size = this->read_big();
       for (int i = 0; i < size; i++) { psa->push_back(this->read_big()); }
     }
@@ -207,7 +209,7 @@ LOOP_END:
     if (is_little_endian()) {
       this->write_little(psa->size());
       while (i != psa->end()) { this->write_little(*i); i++; }
-    else {
+    } else {
       this->write_big(psa->size());
       while (i != psa->end()) { this->write_big(*i); i++; }
     }
