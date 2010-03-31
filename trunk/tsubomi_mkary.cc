@@ -43,17 +43,11 @@ int main(int argc, char **argv) {
       return 0;
     }
 
-    // open textfile and aryfile
-    FILE *fin_text = fopen(textname.c_str(), "r");
-    if (fin_text == NULL) { throw "error at tsubomi_mkary::main(). filename cannot open."; }
-    string aryname = textname + ".ary";
-    FILE *fout_ary = fopen(aryname.c_str(), "wb");
-    if (fout_ary == NULL) { throw "error at tsubomi_mkary::main(). filename.ary cannot open."; }
-
     // make aryfile and write
-    tsubomi::indexer tbm(fin_text);
+    tsubomi::indexer tbm(textname.c_str());
     tbm.mkary(seps.c_str());
-    tbm.write(fout_ary);
+    string aryname = textname + ".ary";
+    tbm.write(aryname.c_str());
   } catch (const char *err) {
     cout << err << endl;
     return 1;

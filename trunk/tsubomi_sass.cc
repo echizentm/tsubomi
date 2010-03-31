@@ -57,11 +57,13 @@ int main(int argc, char **argv) {
     // search matched strings
     if (is_key) { keyword += "\t"; }
     tsubomi::indexer tbm(textname.c_str());
-    pair<long, long> p = tbm.search(keyword.c_str());
+    string aryname = textname + ".ary";
+    tbm.read(aryname.c_str());
+    pair<tsubomi::sa_index, tsubomi::sa_index> p = tbm.search(keyword.c_str());
     if (p.first < 0) { return 0; }
-    for (long i = p.first; i <= p.second; i++) {
+    for (tsubomi::sa_index i = p.first; i <= p.second; i++) {
       if (is_offset) {
-        long offset = tbm.get_offset(i);
+        tsubomi::sa_index offset = tbm.get_offset(i);
         cout << offset << ": "; 
       }
       char buf[1024];

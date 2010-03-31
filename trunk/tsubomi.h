@@ -4,29 +4,30 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include "tsubomi_defs.h"
+#include "tsubomi_mmap.h"
 
 namespace tsubomi {
   using namespace std;
 
   class indexer {
-    FILE         *fin_;
-    bool         is_close_;
-    vector<long> sa_;
+    bool              is_close_;
+    vector<sa_index>  sa_;
+    mmap_reader<char> mr_;
   public:
-    indexer(FILE *fin);
     indexer(const char *filename);
     ~indexer();
     void mkary(const char *seps = "");
-    pair<long, long> search(const char *key);
-    long get_offset(long index);
-    void get_string(long index, char *buf, long size, const char *seps = "");
-    void read(FILE *fin);
-    void write(FILE *fout);
+    pair<sa_index, sa_index> search(const char *key);
+    sa_index get_offset(sa_index index);
+    void get_string(sa_index index, char *buf, sa_index size, const char *seps = "");
+    void read(const char *filename);
+    void write(const char *filename);
   private:
     indexer(const indexer &);
     const indexer &operator=(const indexer &);
-    int compare2key(long offset, const char *key);
-    long binary_search(const char *key, long begin, long end);
+    int compare2key(sa_index offset, const char *key);
+    sa_index binary_search(const char *key, sa_index begin, sa_index end);
   };
 
   class reader {
@@ -34,12 +35,12 @@ namespace tsubomi {
   public:
     reader(FILE *fin);
     ~reader();
-    void read(vector<long> *psa);
+    void read(vector<sa_index> *psa);
   private:
     reader(const reader &);
     const reader &operator=(const reader &);
-    long read_little();
-    long read_big();
+    sa_index read_little();
+    sa_index read_big();
   };
 
   class writer {
@@ -47,40 +48,31 @@ namespace tsubomi {
   public:
     writer(FILE *fout);
     ~writer();
-    void write(vector<long> *psa);
+    void write(vector<sa_index> *psa);
   private:
     writer(const writer &);
     const writer &operator=(const writer &);
-    void write_little(long index);
-    void write_big(long index);
+    void write_little(sa_index index);
+    void write_big(sa_index index);
   };
 
   class comparer {
-    FILE *fin_;
+    mmap_reader<char> &mr_;
   public:
-    comparer(FILE *fin) : fin_(fin) {}
+    comparer(mmap_reader<char> &mr) : mr_(mr) {}
     ~comparer() {}
     // if S[offset2] > S[offset1], then return true
-    bool operator()(long offset1, long offset2) {
+    bool operator()(sa_index offset1, sa_index offset2) {
       int ret = 0;
       while (ret == 0) {
-        if (fseek(this->fin_, offset2++, SEEK_SET) != 0) { return false; }
-        if ((ret = fgetc(this->fin_)) == EOF) { return false; }
-        int ch;
-        if (fseek(this->fin_, offset1++, SEEK_SET) != 0) { return true; }
-        if ((ch = fgetc(this->fin_)) == EOF) { return true; }
-        ret -= ch;
+        if (offset2 >= this->mr_.size()) { return false; }
+        ret = this->mr_[offset2++];
+        if (offset1 >= this->mr_.size()) { return false; }
+        ret -= this->mr_[offset1++];
       }
       return ret > 0;
     }
   };
-
-  inline bool is_little_endian() {
-    int i = 1;
-    char *p = (char *)(&i);
-    if (*p) { return true; }
-    return false;
-  }
 }
 
 #endif

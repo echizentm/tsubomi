@@ -8,31 +8,10 @@ namespace tsubomi {
   //////////////////////////
   // CONSTRUCT & DESTRUCT //
   //////////////////////////
-  indexer::indexer(FILE *fin) : fin_(fin), is_close_(false) {
+  indexer::indexer(const char *filename) : mr_(filename) {
     return;
   }
-
-  indexer::indexer(const char *filename) {
-    this->is_close_ = true;
-    this->fin_ = fopen(filename, "r");
-    if (this->fin_ == NULL) {
-      throw "error at indexer::indexer(). filename cannot open.";
-    }
-
-    string aryname = string(filename);
-    aryname += ".ary";
-    FILE *fin_ary = fopen(aryname.c_str(), "rb");
-    if (fin_ary == NULL) {
-      fclose(this->fin_);
-      throw "error at indexer::indexer(). filename.ary cannot open.";
-    }
-    this->read(fin_ary);
-    fclose(fin_ary);
-    return;
-  }
-
   indexer::~indexer() {
-    if (this->is_close_ && this->fin_) { fclose(this->fin_); }
     return;
   }
 
@@ -40,57 +19,56 @@ namespace tsubomi {
   // PUBLIC FUNCTIONS //
   //////////////////////
   void indexer::mkary(const char *seps) {
-    long offset = 0;
-    int  ch     = '\0';
+    sa_index offset = 0;
+    int      ch     = '\0';
     this->sa_.clear();
     if (seps[0] == '\0') {
-      while ((ch = fgetc(this->fin_)) != EOF) {
+      for (sa_index offset = 0; offset < this->mr_.size(); offset++) {
         this->sa_.push_back(offset);
-        offset++;
       }
     } else {
       bool flg = true;
-      while ((ch = fgetc(this->fin_)) != EOF) {
+      for (sa_index offset = 0; offset < this->mr_.size(); offset++) {
         if (flg) { this->sa_.push_back(offset); flg = false; }
-        for (int i = 0; seps[i] != '\0'; i++) { if (ch == seps[i]) { flg = true; } }
-        offset++;
+        for (int i = 0; seps[i] != '\0'; i++) {
+          if (this->mr_[offset] == seps[i]) { flg = true; }
+        }
       }
     }
-    sort(this->sa_.begin(), this->sa_.end(), comparer(this->fin_));
+    sort(this->sa_.begin(), this->sa_.end(), comparer(this->mr_));
     return;
   }
 
-  pair<long, long> indexer::search(const char *key) {
-    long size  = this->sa_.size();
-    long index = this->binary_search(key, 0, size);
-    if (index == -1) { return pair<long, long>(-1, -1); }
+  pair<sa_index, sa_index> indexer::search(const char *key) {
+    sa_index size  = this->sa_.size();
+    sa_index index = this->binary_search(key, 0, size);
+    if (index == -1) { return pair<sa_index, sa_index>(-1, -1); }
 
-    long begin = index - 1;
-    long end   = index + 1;
+    sa_index begin = index - 1;
+    sa_index end   = index + 1;
     while (begin >= 0 && this->compare2key(this->sa_[begin], key) == 0) { begin--; }
     while (end < size && this->compare2key(this->sa_[end]  , key) == 0) { end++; }
-    return pair<long, long>(begin + 1, end - 1);
+    return pair<sa_index, sa_index>(begin + 1, end - 1);
   }
 
-  long indexer::get_offset(long index) {
+  sa_index indexer::get_offset(sa_index index) {
     if (index < 0 || this->sa_.size() <= index) {
       throw "error at indexer::get_offset(). index is out if range.";
     }
     return this->sa_[index];
   }
 
-  void indexer::get_string(long index, char *buf, long size, const char *seps) {
+  void indexer::get_string(sa_index index, char *buf, sa_index size, const char *seps) {
     if (index < 0 || this->sa_.size() <= index) {
       throw "error at indexer::get_string(). index is out if range.";
     }
-    if (fseek(this->fin_, this->sa_[index], SEEK_SET) != 0) {
-      throw "error at indexer::get_string(). fseek() failure.";
-    }
+    sa_index offset = this->sa_[index];
+
     size--;
     int i = 0;
     while (i < size) {
-      buf[i] = fgetc(this->fin_);
-      if (buf[i] == EOF) { goto LOOP_END; }
+      if (offset >= this->mr_.size()) { goto LOOP_END; }
+      buf[i] = this->mr_[offset++];
       for (int j = 0; seps[j] != '\0'; j++) { if (seps[j] == buf[i]) { goto LOOP_END; } }
       i++;
     }
@@ -99,30 +77,37 @@ LOOP_END:
     return;
   }
 
-  void indexer::read(FILE *fin) {
+  void indexer::read(const char *filename) {
+    FILE *fin = fopen(filename, "rb");
+    if (fin == NULL) {
+      throw "error at indexer::read(). filename cannot open.";
+    }
     reader r(fin);
     this->sa_.clear();
     r.read(&(this->sa_));
+    fclose(fin);
     return;
   }
 
-  void indexer::write(FILE *fout) {
+  void indexer::write(const char *filename) {
+    FILE *fout = fopen(filename, "wb");
+    if (fout == NULL) {
+      throw "error at indexer::write(). filename cannot open.";
+    }
     writer w(fout);
     w.write(&(this->sa_));
+    fclose(fout);
     return;
   }
 
   ///////////////////////
   // PRIVATE FUNCTIONS //
   ///////////////////////
-  int indexer::compare2key(long offset, const char *key) {
-    if (fseek(this->fin_, offset, SEEK_SET) != 0) {
-      throw "error at indexer::compare2key(). fseek() failure.";
-    }
+  int indexer::compare2key(sa_index offset, const char *key) {
     int ret = 0;
     while (ret == 0) {
-      ret = fgetc(this->fin_);
-      if (ret == EOF) { return 1; } // key is greater
+      if (offset >= this->mr_.size()) { return 1; } // key is greater
+      ret = this->mr_[offset++];
       ret = *key - ret;
       key++;
       if (*key == '\0') { break; }
@@ -130,9 +115,9 @@ LOOP_END:
     return ret;
   }
 
-  long indexer::binary_search(const char *key, long begin, long end) {
+  sa_index indexer::binary_search(const char *key, sa_index begin, sa_index end) {
     if (begin >= end) { return -1; }
-    long pivot = (begin + end) / 2;
+    sa_index pivot = (begin + end) / 2;
     int ret = this->compare2key(this->sa_[pivot], key);
 
     if      (ret < 0) { return this->binary_search(key, begin, pivot); }
@@ -156,12 +141,12 @@ LOOP_END:
   //////////////////////
   // PUBLIC FUNCTIONS //
   //////////////////////
-  void reader::read(vector<long> *psa) {
+  void reader::read(vector<sa_index> *psa) {
     if (is_little_endian()) {
-      long size = this->read_little();
+      sa_index size = this->read_little();
       for (int i = 0; i < size; i++) { psa->push_back(this->read_little()); }
     } else {
-      long size = this->read_big();
+      sa_index size = this->read_big();
       for (int i = 0; i < size; i++) { psa->push_back(this->read_big()); }
     }
     return;
@@ -170,20 +155,20 @@ LOOP_END:
   ///////////////////////
   // PRIVATE FUNCTIONS //
   ///////////////////////
-  long reader::read_little() {
-    long index;
-    if (fread(&index, sizeof(long), 1, this->fin_) < 1) {
+  sa_index reader::read_little() {
+    sa_index index;
+    if (fread(&index, sizeof(sa_index), 1, this->fin_) < 1) {
       throw "error at reader::read_little(). fread() failure.";
     }
     return index;
   }
 
-  long reader::read_big() {
-    long index     = this->read_little();
-    char *p        = (char *)(&index);
-    long rev_index;
-    char *rp       = (char *)(&rev_index);
-    int  n         = sizeof(long);
+  sa_index reader::read_big() {
+    sa_index index = this->read_little();
+    sa_index rev_index;
+    char *p  = (char *)(&index);
+    char *rp = (char *)(&rev_index);
+    int  n   = sizeof(sa_index);
     for (int i = 0; i < n; i++) { rp[i] = p[i]; }
     return rev_index;
   }
@@ -204,8 +189,8 @@ LOOP_END:
   //////////////////////
   // PUBLIC FUNCTIONS //
   //////////////////////
-  void writer::write(vector<long> *psa) {
-    vector<long>::iterator i = psa->begin();
+  void writer::write(vector<sa_index> *psa) {
+    vector<sa_index>::iterator i = psa->begin();
     if (is_little_endian()) {
       this->write_little(psa->size());
       while (i != psa->end()) { this->write_little(*i); i++; }
@@ -219,18 +204,18 @@ LOOP_END:
   ///////////////////////
   // PRIVATE FUNCTIONS //
   ///////////////////////
-  void writer::write_little(long index) {
-    if (fwrite(&index, sizeof(long), 1, this->fout_) < 1) {
+  void writer::write_little(sa_index index) {
+    if (fwrite(&index, sizeof(sa_index), 1, this->fout_) < 1) {
       throw "error at writer::write_little(). fwrite() failure.";
     }
     return;
   }
 
-  void writer::write_big(long index) {
-    char *p        = (char *)(&index);
-    long rev_index;
-    char *rp       = (char *)(&rev_index);
-    int  n         = sizeof(long);
+  void writer::write_big(sa_index index) {
+    sa_index rev_index;
+    char *p  = (char *)(&index);
+    char *rp = (char *)(&rev_index);
+    int  n   = sizeof(sa_index);
     for (int i = 0; i < n; i++) { rp[i] = p[i]; }
     this->write_little(rev_index);
     return;
