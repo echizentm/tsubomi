@@ -17,7 +17,7 @@ namespace tsubomi {
   public:
     indexer(const char *filename);
     ~indexer();
-    void mkary(const char *seps = "");
+    void mkary(const char *seps = "", bool is_progress = false);
     pair<sa_index, sa_index> search(const char *key);
     sa_index get_offset(sa_index index);
     void get_string(sa_index index, char *buf, sa_index size, const char *seps = "");
@@ -56,13 +56,35 @@ namespace tsubomi {
     void write_big(sa_index index);
   };
 
+  class progress_bar {
+    int cur_;
+    int max_;
+    int star_;
+  public:
+    progress_bar(int max) : cur_(0), max_(max), star_(0) {}
+    ~progress_bar() {};
+    void progress(int num) {
+      this->cur_ += num;
+      if (this->cur_ >= this->max_) {
+        if (star_ < 40) { cout << "*"; this->star_++; }
+        this->cur_ = 0;
+      }
+      return;
+    }
+  };
+
   class comparer {
     mmap_reader<char> &mr_;
+    progress_bar      *pprg_;
   public:
-    comparer(mmap_reader<char> &mr) : mr_(mr) {}
+    comparer(mmap_reader<char> &mr, progress_bar *pprg = NULL)
+     : mr_(mr), pprg_(pprg) {}
     ~comparer() {}
+
     // if S[offset2] > S[offset1], then return true
     bool operator()(sa_index offset1, sa_index offset2) {
+      if (this->pprg_) { this->pprg_->progress(1); }
+
       int ret = 0;
       while (ret == 0) {
         if (offset2 >= this->mr_.size()) { return false; }

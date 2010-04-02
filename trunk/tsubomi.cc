@@ -1,6 +1,7 @@
 // $Id$
 #include "tsubomi.h"
 #include <algorithm>
+#include <cmath>
 
 namespace tsubomi {
   using namespace std;
@@ -18,7 +19,7 @@ namespace tsubomi {
   //////////////////////
   // PUBLIC FUNCTIONS //
   //////////////////////
-  void indexer::mkary(const char *seps) {
+  void indexer::mkary(const char *seps, bool is_progress) {
     sa_index offset = 0;
     int      ch     = '\0';
     this->sa_.clear();
@@ -35,7 +36,16 @@ namespace tsubomi {
         }
       }
     }
-    sort(this->sa_.begin(), this->sa_.end(), comparer(this->mr_));
+
+    if (is_progress) {
+      int N = this->sa_.size();
+      progress_bar prg(int(N * log(N) / log(2) / 40));
+      cout << "+--------------------------------------+" << endl;
+      sort(this->sa_.begin(), this->sa_.end(), comparer(this->mr_, &prg));
+      cout << endl << "done!" << endl;
+    } else {
+      sort(this->sa_.begin(), this->sa_.end(), comparer(this->mr_));
+    }
     return;
   }
 
