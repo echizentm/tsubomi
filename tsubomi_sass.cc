@@ -1,4 +1,5 @@
 // $Id$
+#include <iostream>
 #include <string>
 #include "tsubomi.h"
 
@@ -8,13 +9,13 @@ using namespace std;
 int main(int argc, char **argv) {
  try {
     // read command line parameters
-    string textname  = "";
-    string keyword   = "";
-    string seps      = "";
-    bool   is_help   = false;
-    bool   is_key    = false;
-    bool   is_offset = false;
-    char   param     = '\0';
+    char *textname = "";
+    char *keyword  = "";
+    char *seps     = "";
+    bool is_help   = false;
+    bool is_key    = false;
+    bool is_offset = false;
+    char param     = '\0';
     for (int i = 1; i < argc; i++) {
       if (argv[i][0] == '-') {
         if (argv[i][1] == '\0') { continue; }
@@ -28,14 +29,14 @@ int main(int argc, char **argv) {
         }
       } else if (param) {
         switch (param) {
-          case 't': seps = string(argv[i]); break;
+          case 't': seps = argv[i]; break;
         }
         param = '\0';
       } else {
         if (textname == "") {
-          textname = string(argv[i]);
+          textname = argv[i];
         } else {
-          keyword  = string(argv[i]);
+          keyword  = argv[i];
         }
       }
     }
@@ -55,23 +56,24 @@ int main(int argc, char **argv) {
     }
 
     // search matched strings
-    if (is_key) { keyword += "\t"; }
-    tsubomi::indexer tbm(textname.c_str());
-    string aryname = textname + ".ary";
-    tbm.read(aryname.c_str());
-    pair<tsubomi::sa_index, tsubomi::sa_index> p = tbm.search(keyword.c_str());
+    tsubomi::searcher tbm(textname);
+
+    string keyword_str = keyword;
+    if (is_key) { keyword_str += "\t"; }
+    tsubomi::sa_range p = tbm.search(keyword_str.c_str());
     if (p.first < 0) { return 0; }
+
     for (tsubomi::sa_index i = p.first; i <= p.second; i++) {
       if (is_offset) {
         tsubomi::sa_index offset = tbm.get_offset(i);
         cout << offset << ": "; 
       }
       char buf[1024];
-      tbm.get_string(i, buf, 1024, seps.c_str());
+      tbm.get_string(i, buf, 1024, seps);
       cout << buf << endl;
     }
   } catch (const char *err) {
-    cout << err << endl;
+    cerr << err << endl;
     return 1;
   }
   return 0;
