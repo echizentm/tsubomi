@@ -1,5 +1,5 @@
 // $Id$
-#include <string>
+#include <iostream>
 #include "tsubomi.h"
 
 using namespace std;
@@ -8,11 +8,11 @@ using namespace std;
 int main(int argc, char **argv) {
   try {
    // read command line parameters
-    string textname    = "";
-    string seps        = "";
-    bool   is_help     = false;
-    bool   is_progress = false;
-    char   param     = '\0';
+    char *textname   = "";
+    char *seps       = "";
+    bool is_help     = false;
+    bool is_progress = false;
+    char param     = '\0';
     for (int i = 1; i < argc; i++) {
       if (argv[i][0] == '-') {
         if (argv[i][1] == '\0') { continue; }
@@ -25,11 +25,11 @@ int main(int argc, char **argv) {
         }
       } else if (param) {
         switch (param) {
-          case 't': seps = string(argv[i]); break;
+          case 't': seps = argv[i]; break;
         }
         param = '\0';
       } else {
-        textname = string(argv[i]);
+        textname = argv[i];
       }
     }
 
@@ -47,12 +47,10 @@ int main(int argc, char **argv) {
     }
 
     // make aryfile and write
-    tsubomi::indexer tbm(textname.c_str());
-    tbm.mkary(seps.c_str(), is_progress);
-    string aryname = textname + ".ary";
-    tbm.write(aryname.c_str());
+    tsubomi::indexer tbm;
+    tbm.mkary(textname, seps, is_progress);
   } catch (const char *err) {
-    cout << err << endl;
+    cerr << err << endl;
     return 1;
   }
   return 0;
