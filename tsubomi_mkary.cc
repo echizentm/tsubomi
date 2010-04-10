@@ -47,8 +47,8 @@ int main(int argc, char **argv) {
     }
 
     // make aryfile and write
-    tsubomi::indexer tbm;
-    tbm.mkary(textname, seps, is_progress);
+    tsubomi::indexer tbm(textname);
+    tbm.mkary(seps, is_progress);
   } catch (const char *err) {
     cerr << err << endl;
     return 1;
