@@ -23,8 +23,8 @@ namespace tsubomi {
     indexer(const indexer &);
     const indexer &operator=(const indexer &);
 
-    void sais(vector<sa_index> &sa, progress_bar *pprg = NULL);
-    int compare(sa_index i1, sa_index i2, vector<sa_index> &sa);
+    void sort(vector<sa_index> &sa, sa_index begin, sa_index end,
+              sa_index depth, progress_bar *pprg = NULL);
   };
 }
 
