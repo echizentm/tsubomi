@@ -47,6 +47,13 @@ LOOP_END:
     return;
   }
 
+  bool searcher::get_value(const char *key, char *buf, sa_index size, const char *seps) {
+    sa_range r = this->search(key);
+    if (r.first < 0) { return false; }
+    this->get_string(r.first, buf, size, seps);
+    return true;
+  }
+
   int searcher::compare2key(sa_index offset, const char *key) {
     int ret = 0;
     while (ret == 0) {

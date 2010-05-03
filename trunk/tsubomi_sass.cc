@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
                       "(word is separated by \" \\t\\n\")" << endl;
       cout << "  t(s): print matched strings to separators (s)." << endl;
       cout << "  k   : match only 1st columnn of tsv." << endl;
-      cout << "  o   : print index offset for matched lines." << endl;
+      cout << "  o   : print index offset for matched strings." << endl;
       cout << "  h   : print help message." << endl;
       return 0;
     }
