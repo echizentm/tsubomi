@@ -17,7 +17,7 @@ namespace tsubomi {
   public:
     indexer(const char *filename) : filename_(filename), mr_file_(filename) {}
     ~indexer() {}
-    void mkary(const char *seps = "", bool is_progress = false);
+    void mkary(const char *seps = "", bool is_utf8 = false, bool is_progress = false);
 
   private:
     indexer(const indexer &);

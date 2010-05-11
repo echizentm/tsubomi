@@ -11,6 +11,18 @@ namespace tsubomi {
   using namespace std;
 
   ////////////////////////////////////////////////////////////////
+  const sa_index utf8_char_size[] = {
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+    3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,6,6,1,1
+  };
+
+  ////////////////////////////////////////////////////////////////
   class writer {
     FILE *fout_;
   public:
@@ -57,10 +69,16 @@ namespace tsubomi {
 
   ////////////////////////////////////////////////////////////////
   // class indexer
-  void indexer::mkary(const char *seps, bool is_progress) {
+  void indexer::mkary(const char *seps, bool is_utf8, bool is_progress) {
     // read index from file
     vector<sa_index> sa;
-    if (seps[0] == '\0') {
+    if (is_utf8) {
+      for (sa_index offset = 0;
+           offset < this->mr_file_.size();
+           offset += utf8_char_size[(unsigned char)(this->mr_file_[offset])]) {
+        sa.push_back(offset);
+      }
+    } else if (seps[0] == '\0') {
       for (sa_index offset = 0; offset < this->mr_file_.size(); offset++) {
         sa.push_back(offset);
       }
