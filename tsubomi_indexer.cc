@@ -22,6 +22,23 @@ namespace tsubomi {
     3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,6,6,1,1
   };
 
+  inline sa_index get_utf8_char_size(char ch) {
+    if (!((ch & 0x80) ^ 0x00)) {
+      return 1;
+    } else if (!((ch & 0xE0) ^ 0xC0)) {
+      return 2;
+    } else if (!((ch & 0xF0) ^ 0xE0)) {
+      return 3;
+    } else if (!((ch & 0xF8) ^ 0xF0)) {
+      return 4;
+    } else if (!((ch & 0xFC) ^ 0xF8)) {
+      return 5;
+    } else if (!((ch & 0xFE) ^ 0xFC)) {
+      return 6;
+    }
+    throw "error at get_utf8_char_size(). ch is not head of utf8.";
+  }
+
   ////////////////////////////////////////////////////////////////
   class writer {
     FILE *fout_;
@@ -75,8 +92,12 @@ namespace tsubomi {
     if (is_utf8) {
       for (sa_index offset = 0;
            offset < this->mr_file_.size();
-           offset += utf8_char_size[(unsigned char)(this->mr_file_[offset])]) {
+//           offset += utf8_char_size[(unsigned char)(this->mr_file_[offset])]) {
+//           offset += get_utf8_char_size(this->mr_file_[offset])) {
+          ) {
         sa.push_back(offset);
+        sa_index char_size = get_utf8_char_size(this->mr_file_[offset]);
+        offset += char_size;
       }
     } else if (seps[0] == '\0') {
       for (sa_index offset = 0; offset < this->mr_file_.size(); offset++) {
