@@ -11,6 +11,7 @@ int main(int argc, char **argv) {
     char *textname   = "";
     char *seps       = "";
     bool is_help     = false;
+    bool is_utf8     = false;
     bool is_progress = false;
     char param     = '\0';
     for (int i = 1; i < argc; i++) {
@@ -19,6 +20,7 @@ int main(int argc, char **argv) {
         switch (argv[i][1]) {
           case 'l': seps        = "\n";       break;
           case 'w': seps        = " \t\n";    break;
+          case 'u': is_utf8     = true;       break;
           case 'p': is_progress = true;       break;
           case 'h': is_help     = true;       break;
           default : param       = argv[i][1]; break;
@@ -41,6 +43,7 @@ int main(int argc, char **argv) {
       cout << "  w   : index fot each word." << 
                       "(word is separated by \" \\t\\n\")" << endl;
       cout << "  t(s): index for pointer after separators (s)." << endl;
+      cout << "  u   : index for each utf8 character." << endl;
       cout << "  p   : print progress bar while making suffix array." << endl;
       cout << "  h   : print help message." << endl;
       return 0;
@@ -48,7 +51,7 @@ int main(int argc, char **argv) {
 
     // make aryfile and write
     tsubomi::indexer tbm(textname);
-    tbm.mkary(seps, is_progress);
+    tbm.mkary(seps, is_utf8, is_progress);
   } catch (const char *err) {
     cerr << err << endl;
     return 1;
