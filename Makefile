@@ -5,9 +5,10 @@ SRC = tsubomi_indexer.cc tsubomi_searcher.cc
 HDR = tsubomi_indexer.h tsubomi_searcher.h tsubomi_mmap.h tsubomi_defs.h tsubomi.h
 
 tsubomi: tsubomi_mkary tsubomi_sass libtsubomi
+win: tsubomi_mkary tsubomi_sass
 	
 tsubomi_mkary: $(SRC_I) $(HDR) tsubomi_mkary.cc
-	g++ -O2 -Wall -fPIC -g tsubomi_indexer.cc tsubomi_mkary.cc -o tsubomi_mkary
+	g++ -O2 -Wall -g tsubomi_indexer.cc tsubomi_mkary.cc -o tsubomi_mkary
 
 tsubomi_sass: $(SRC_S) $(HDR) tsubomi_sass.cc
 	g++ -O2 -Wall -g tsubomi_searcher.cc tsubomi_sass.cc -o tsubomi_sass

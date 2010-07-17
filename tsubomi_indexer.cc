@@ -22,43 +22,48 @@ namespace tsubomi {
     3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,6,6,1,1
   };
 
-  inline sa_index get_utf8_char_size(char ch) {
-    if (!((ch & 0x80) ^ 0x00)) {
-      return 1;
-    } else if (!((ch & 0xE0) ^ 0xC0)) {
-      return 2;
-    } else if (!((ch & 0xF0) ^ 0xE0)) {
-      return 3;
-    } else if (!((ch & 0xF8) ^ 0xF0)) {
-      return 4;
-    } else if (!((ch & 0xFC) ^ 0xF8)) {
-      return 5;
-    } else if (!((ch & 0xFE) ^ 0xFC)) {
-      return 6;
-    }
-    throw "error at get_utf8_char_size(). ch is not head of utf8.";
-  }
-
   ////////////////////////////////////////////////////////////////
   class writer {
     FILE *fout_;
   public:
     writer(FILE *fout) : fout_(fout) {}
     ~writer() {}
-    void write(vector<sa_index> *psa);
+    void write(vector<sa_index> &sa);
   private:
     writer(const writer &);
     const writer &operator=(const writer &);
   };
 
-  void writer::write(vector<sa_index> *psa) {
-    vector<sa_index>::iterator i = psa->begin();
-    while (i != psa->end()) {
+  void writer::write(vector<sa_index> &sa) {
+    vector<sa_index>::iterator i = sa.begin();
+    while (i != sa.end()) {
       sa_index index = *i;
       if (fwrite(&index, sizeof(sa_index), 1, this->fout_) < 1) {
         throw "error at writer::write(). fwrite() failure.";
       }
       i++;
+    }
+    return;
+  }
+
+  class reader {
+    FILE *fin_;
+  public:
+    reader(FILE *fin) : fin_(fin) {}
+    ~reader() {}
+    void read(vector<sa_index> &sa);
+  private:
+    reader(const reader &);
+    const reader &operator=(const reader &);
+  };
+
+  void reader::read(vector<sa_index> &sa) {
+    sa_index index;
+    while (1) {
+      if (fread(&index, sizeof(sa_index), 1, this->fin_) < 1) {
+        break;
+      }
+      sa.push_back(index);
     }
     return;
   }
@@ -86,18 +91,13 @@ namespace tsubomi {
 
   ////////////////////////////////////////////////////////////////
   // class indexer
-  void indexer::mkary(const char *seps, bool is_utf8, bool is_progress) {
+  void indexer::mkary_make(vector<sa_index> &sa, const char *seps, bool is_utf8) {
     // read index from file
-    vector<sa_index> sa;
     if (is_utf8) {
       for (sa_index offset = 0;
            offset < this->mr_file_.size();
-//           offset += utf8_char_size[(unsigned char)(this->mr_file_[offset])]) {
-//           offset += get_utf8_char_size(this->mr_file_[offset])) {
-          ) {
+           offset += utf8_char_size[(unsigned char)(this->mr_file_[offset])]) {
         sa.push_back(offset);
-        sa_index char_size = get_utf8_char_size(this->mr_file_[offset]);
-        offset += char_size;
       }
     } else if (seps[0] == '\0') {
       for (sa_index offset = 0; offset < this->mr_file_.size(); offset++) {
@@ -112,8 +112,11 @@ namespace tsubomi {
         }
       }
     }
+    return;
+  }
 
-    // sort index & make suffix array
+  void indexer::mkary_sort(vector<sa_index> &sa, bool is_progress) {
+    // sort index
     srand((unsigned)time(NULL));
     int N = sa.size();
     if (is_progress) {
@@ -124,16 +127,37 @@ namespace tsubomi {
     } else {
       this->sort(sa, 0, N - 1, 0);
     }
+    return;
+  }
 
-    // write suffix array as "filename.ary"
+  void indexer::mkary(const char *seps, bool is_utf8, bool is_progress,
+                      bool is_make, bool is_sort) {
     string aryname(this->filename_);
     aryname += ".ary";
+    vector<sa_index> sa;
+
+    if (is_make) {
+      this->mkary_make(sa, seps, is_utf8);
+    } else {
+      FILE *fin = fopen(aryname.c_str(), "rb");
+      if (fin == NULL) {
+        throw "error at indexer::mkary(). filename.ary cannot open for read.";
+      }
+      reader r(fin);
+      r.read(sa);
+      fclose(fin);
+    }
+    if (is_sort) {
+      this->mkary_sort(sa, is_progress);
+    }
+
+    // write suffix array as "filename.ary"
     FILE *fout = fopen(aryname.c_str(), "wb");
     if (fout == NULL) {
-      throw "error at indexer::mkary(). filename.ary cannot open.";
+      throw "error at indexer::mkary(). filename.ary cannot open for write.";
     }
     writer w(fout);
-    w.write(&sa);
+    w.write(sa);
     fclose(fout);
     return;
   }
