@@ -9,9 +9,9 @@ using namespace std;
 int main(int argc, char **argv) {
  try {
     // read command line parameters
-    char *textname = "";
-    char *keyword  = "";
-    char *seps     = "";
+    const char *textname = "";
+    const char *keyword  = "";
+    const char *seps     = "";
     bool is_help   = false;
     bool is_key    = false;
     bool is_offset = false;

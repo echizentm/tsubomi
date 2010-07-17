@@ -8,11 +8,13 @@ using namespace std;
 int main(int argc, char **argv) {
   try {
    // read command line parameters
-    char *textname   = "";
-    char *seps       = "";
+    const char *textname   = "";
+    const char *seps       = "";
     bool is_help     = false;
     bool is_utf8     = false;
     bool is_progress = false;
+    bool is_makeonly = false;
+    bool is_sortonly = false;
     char param     = '\0';
     for (int i = 1; i < argc; i++) {
       if (argv[i][0] == '-') {
@@ -22,6 +24,8 @@ int main(int argc, char **argv) {
           case 'w': seps        = " \t\n";    break;
           case 'u': is_utf8     = true;       break;
           case 'p': is_progress = true;       break;
+          case 'm': is_makeonly = true;       break;
+          case 's': is_sortonly = true;       break;
           case 'h': is_help     = true;       break;
           default : param       = argv[i][1]; break;
         }
@@ -39,19 +43,26 @@ int main(int argc, char **argv) {
     if (textname == "" || is_help) {
       cout << "[USAGE] tsubomi_mkary [params] textfile" << endl;
       cout << "[OPTIONS]" << endl;
-      cout << "  l   : index fot each line." << endl;
-      cout << "  w   : index fot each word." << 
+      cout << "  l   : index for each line." << endl;
+      cout << "  w   : index for each word." << 
                       "(word is separated by \" \\t\\n\")" << endl;
       cout << "  t(s): index for pointer after separators (s)." << endl;
       cout << "  u   : index for each utf8 character." << endl;
+      cout << "  m   : make-onky mode. make unsorted \"*.ary\"." << endl;
+      cout << "  s   : sort-only mode. make suffix array from unsorted \"*.ary\"." << endl;
       cout << "  p   : print progress bar while making suffix array." << endl;
       cout << "  h   : print help message." << endl;
       return 0;
     }
 
     // make aryfile and write
+    bool is_make = true;
+    if (is_sortonly) { is_make = false; }
+    bool is_sort = true;
+    if (is_makeonly) { is_sort = false; }
+
     tsubomi::indexer tbm(textname);
-    tbm.mkary(seps, is_utf8, is_progress);
+    tbm.mkary(seps, is_utf8, is_progress, is_make, is_sort);
   } catch (const char *err) {
     cerr << err << endl;
     return 1;
