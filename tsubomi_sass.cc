@@ -12,10 +12,10 @@ int main(int argc, char **argv) {
     const char *textname = "";
     const char *keyword  = "";
     const char *seps     = "";
-    bool is_help   = false;
-    bool is_key    = false;
-    bool is_offset = false;
-    char param     = '\0';
+    bool is_help         = false;
+    bool is_key          = false;
+    bool is_offset       = false;
+    char param           = '\0';
     for (int i = 1; i < argc; i++) {
       if (argv[i][0] == '-') {
         if (argv[i][1] == '\0') { continue; }
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
         }
         param = '\0';
       } else {
-        if (textname == "") {
+        if (textname[0] == '\0') {
           textname = argv[i];
         } else {
           keyword  = argv[i];
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     }
 
     // write helo message and exit
-    if (keyword == "" || is_help) {
+    if (keyword[0] == '\0' || is_help) {
       cout << "[USAGE] tsubomi_sass [params] textfile keyword" << endl;
       cout << "[OPTIONS]" << endl;
       cout << "  l   : print matched strings as line." << endl;
