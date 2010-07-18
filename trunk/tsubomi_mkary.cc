@@ -8,14 +8,14 @@ using namespace std;
 int main(int argc, char **argv) {
   try {
    // read command line parameters
-    const char *textname   = "";
-    const char *seps       = "";
-    bool is_help     = false;
-    bool is_utf8     = false;
-    bool is_progress = false;
-    bool is_makeonly = false;
-    bool is_sortonly = false;
-    char param     = '\0';
+    const char *textname = "";
+    const char *seps     = "";
+    bool is_help         = false;
+    bool is_utf8         = false;
+    bool is_progress     = false;
+    bool is_makeonly     = false;
+    bool is_sortonly     = false;
+    char param           = '\0';
     for (int i = 1; i < argc; i++) {
       if (argv[i][0] == '-') {
         if (argv[i][1] == '\0') { continue; }
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     }
 
     // write helo message and exit
-    if (textname == "" || is_help) {
+    if (textname[0] == '\0' || is_help) {
       cout << "[USAGE] tsubomi_mkary [params] textfile" << endl;
       cout << "[OPTIONS]" << endl;
       cout << "  l   : index for each line." << endl;
