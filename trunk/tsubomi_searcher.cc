@@ -32,18 +32,44 @@ namespace tsubomi {
     if (index < 0 || this->mr_sa_.size() <= index) {
       throw "error at searcher::get_string(). index is out of range.";
     }
-    sa_index offset = this->mr_sa_[index];
-
     size--;
-    int i = 0;
+    sa_index offset = this->mr_sa_[index];
+    sa_index rest = this->mr_file_.size() - offset;
+    if (size > rest) { size = rest; }
+
+    sa_index i = 0;
     while (i < size) {
-      if (offset >= this->mr_file_.size()) { goto LOOP_END; }
       buf[i] = this->mr_file_[offset++];
       for (int j = 0; seps[j] != '\0'; j++) { if (seps[j] == buf[i]) { goto LOOP_END; } }
       i++;
     }
 LOOP_END:
     buf[i] = '\0';
+    return;
+  }
+  // size of "buf" is (left + right + 2)  
+  void searcher::get_string(sa_index index, char *buf,
+                            sa_index left, const char *seps_l,
+                            sa_index right, const char *seps_r) {
+    if (index < 0 || this->mr_sa_.size() <= index) {
+      throw "error at searcher::get_string(). index is out of range.";
+    }
+    sa_index offset = this->mr_sa_[index];
+    if (left > offset) { left = offset; }
+
+    sa_index i = left - 1;
+    while (i >= 0) {
+      char b = this->mr_file_[--offset];
+      for (int j = 0; seps_l[j] != '\0'; j++) {
+        if (seps_l[j] == b) { offset++; goto LOOP_END; }
+      }
+      i--;
+    }
+LOOP_END:
+    left = (left - i - 1);
+    sa_index k;
+    for (k = 0; k < left; k++) { buf[k] = this->mr_file_[offset + k]; }
+    this->get_string(index, buf + k, right + 2, seps_r);
     return;
   }
 

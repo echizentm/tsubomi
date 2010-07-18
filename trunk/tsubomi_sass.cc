@@ -15,6 +15,7 @@ int main(int argc, char **argv) {
     bool is_help         = false;
     bool is_key          = false;
     bool is_offset       = false;
+    tsubomi::sa_index wndsize = 0;
     char param           = '\0';
     for (int i = 1; i < argc; i++) {
       if (argv[i][0] == '-') {
@@ -29,7 +30,8 @@ int main(int argc, char **argv) {
         }
       } else if (param) {
         switch (param) {
-          case 't': seps = argv[i]; break;
+          case 't': seps    = argv[i];       break;
+          case 's': wndsize = atoi(argv[i]); break;
         }
         param = '\0';
       } else {
@@ -51,6 +53,7 @@ int main(int argc, char **argv) {
       cout << "  t(s): print matched strings to separators (s)." << endl;
       cout << "  k   : match only 1st columnn of tsv." << endl;
       cout << "  o   : print index offset for matched strings." << endl;
+      cout << "  s   : windows size(if not defined, print keyword to end)." << endl;
       cout << "  h   : print help message." << endl;
       return 0;
     }
@@ -69,7 +72,12 @@ int main(int argc, char **argv) {
         cout << offset << ": "; 
       }
       char buf[1024];
-      tbm.get_string(i, buf, 1024, seps);
+      if (wndsize == 0) {
+        tbm.get_string(i, buf, 1024, seps);
+      } else {
+        if (wndsize > 511) { wndsize = 511; }
+        tbm.get_string(i, buf, wndsize, seps, wndsize, seps);
+      }
       cout << buf << endl;
     }
   } catch (const char *err) {

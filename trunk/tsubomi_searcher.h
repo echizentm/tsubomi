@@ -20,6 +20,8 @@ namespace tsubomi {
     sa_range search(const char *key, sa_index begin, sa_index end);
     sa_index get_offset(sa_index index);
     void get_string(sa_index index, char *buf, sa_index size, const char *seps = "");
+    void get_string(sa_index index, char *buf,
+                    sa_index left, const char *seps_l, sa_index right, const char *seps_r);
     bool get_value(const char *key, char *buf, sa_index size, const char *seps = "");
 
   private:
