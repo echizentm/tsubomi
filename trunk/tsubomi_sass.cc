@@ -15,23 +15,23 @@ int main(int argc, char **argv) {
     bool is_help         = false;
     bool is_key          = false;
     bool is_offset       = false;
-    tsubomi::sa_index wndsize = 0;
+    bool is_snippet      = false;
     char param           = '\0';
     for (int i = 1; i < argc; i++) {
       if (argv[i][0] == '-') {
         if (argv[i][1] == '\0') { continue; }
         switch (argv[i][1]) {
-          case 'l': seps      = "\n";       break;
-          case 'w': seps      = " \t\n";    break;
-          case 'k': is_key    = true;       break;
-          case 'o': is_offset = true;       break;
-          case 'h': is_help   = true;       break;
-          default : param     = argv[i][1]; break;
+          case 'l': seps       = "\n";       break;
+          case 'w': seps       = " \t\n";    break;
+          case 'k': is_key     = true;       break;
+          case 'o': is_offset  = true;       break;
+          case 'h': is_help    = true;       break;
+          case 's': is_snippet = true;       break;
+          default : param      = argv[i][1]; break;
         }
       } else if (param) {
         switch (param) {
           case 't': seps    = argv[i];       break;
-          case 's': wndsize = atoi(argv[i]); break;
         }
         param = '\0';
       } else {
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
       cout << "  t(s): print matched strings to separators (s)." << endl;
       cout << "  k   : match only 1st columnn of tsv." << endl;
       cout << "  o   : print index offset for matched strings." << endl;
-      cout << "  s   : windows size(if not defined, print keyword to end)." << endl;
+      cout << "  s   : snnipet mode. print left & right text of keyword." << endl;
       cout << "  h   : print help message." << endl;
       return 0;
     }
@@ -72,11 +72,10 @@ int main(int argc, char **argv) {
         cout << offset << ": "; 
       }
       char buf[1024];
-      if (wndsize == 0) {
-        tbm.get_string(i, buf, 1024, seps);
+      if (is_snippet) {
+        tbm.get_string(i, buf, 511, seps, 511, seps);
       } else {
-        if (wndsize > 511) { wndsize = 511; }
-        tbm.get_string(i, buf, wndsize, seps, wndsize, seps);
+        tbm.get_string(i, buf, 1024, seps);
       }
       cout << buf << endl;
     }
