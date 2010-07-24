@@ -6,6 +6,14 @@ namespace tsubomi {
 
   ////////////////////////////////////////////////////////////////
   // class searcher
+  searcher::searcher(const char *filename)
+   : mr_file_(filename), mr_sa_(string(filename) + ".ary") {
+    return;
+  }
+  searcher::~searcher() {
+    return;
+  }
+
   sa_range searcher::search(const char *key) {
     return this->search(key, 0, this->mr_sa_.size() - 1);
   }

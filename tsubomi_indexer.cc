@@ -91,6 +91,14 @@ namespace tsubomi {
 
   ////////////////////////////////////////////////////////////////
   // class indexer
+  indexer::indexer(const char *filename)
+   : filename_(filename), mr_file_(filename) {
+    return;
+  }
+  indexer::~indexer() {
+    return;
+  }
+
   void indexer::mkary_make(vector<sa_index> &sa, const char *seps, bool is_utf8) {
     // read index from file
     if (is_utf8) {

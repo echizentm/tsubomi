@@ -23,8 +23,6 @@
 
 
 namespace tsubomi {
-  using namespace std;
-
   template<class T> class mmap_reader {
 #ifdef  TSUBOMI_WIN
     HANDLE   hFile_;
@@ -35,7 +33,7 @@ namespace tsubomi {
     sa_index size_;
 
   public:
-    mmap_reader(const string &filename);
+    mmap_reader(const std::string &filename);
     ~mmap_reader();
     sa_index size_byte() { return this->size_byte_; }
     sa_index size() { return this->size_; }
@@ -48,7 +46,7 @@ namespace tsubomi {
     const mmap_reader &operator=(const mmap_reader &);
   };
 
-  template<class T> mmap_reader<T>::mmap_reader(const string &filename) {
+  template<class T> mmap_reader<T>::mmap_reader(const std::string &filename) {
 #ifdef  TSUBOMI_WIN
     this->hFile_ = CreateFile(filename.c_str(), GENERIC_READ, 0, NULL, 
                               OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
