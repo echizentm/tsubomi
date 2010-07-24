@@ -5,16 +5,11 @@
 #include "tsubomi_mmap.h"
 
 namespace tsubomi {
-  using namespace std;
-
   class searcher {
-    mmap_reader<char>     mr_file_;
-    mmap_reader<sa_index> mr_sa_;
 
   public:
-    searcher(const char *filename)
-     : mr_file_(filename), mr_sa_(string(filename) + ".ary") {}
-    ~searcher() {}
+    searcher(const char *filename);
+    ~searcher();
 
     sa_range search(const char *key);
     sa_range search(const char *key, sa_index begin, sa_index end);
@@ -25,6 +20,9 @@ namespace tsubomi {
     bool get_value(const char *key, char *buf, sa_index size, const char *seps = "");
 
   private:
+    mmap_reader<char>     mr_file_;
+    mmap_reader<sa_index> mr_sa_;
+
     searcher(const searcher &);
     const searcher &operator=(const searcher &);
 
