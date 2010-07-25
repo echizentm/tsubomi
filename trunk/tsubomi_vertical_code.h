@@ -8,11 +8,10 @@
 namespace tsubomi {
   typedef unsigned long long ullong;
   typedef unsigned int       uint;
-  typedef unsigned char      uchar;
 
   class vertical_code {
     std::vector<uint>   cMSB_;
-    std::vector<uint>   base_;
+    std::vector<ullong> base_;
     std::vector<ullong> V_;
     ullong              size_;
     ullong              block_size_;
