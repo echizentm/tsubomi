@@ -64,6 +64,10 @@ namespace tsubomi {
     }
     ~vertical_code() {}
 
+    ullong size() {
+      return this->size_;
+    }
+
     void push(ullong d) {
       // add element to vector if size is over
       ullong q = this->size_ % this->block_size_;
