@@ -12,10 +12,10 @@ tsubomi_mkary: $(HDR) tsubomi_indexer.cc tsubomi_mkary.cc
 tsubomi_sass: $(HDR) tsubomi_searcher.cc tsubomi_sass.cc
 	g++ -O2 -Wall -g tsubomi_searcher.cc tsubomi_sass.cc -o tsubomi_sass
 
-tsubomi_mkii: $(HDR) tsubomi_mkii.cc
-	g++ -O2 -Wall -g tsubomi_mkii.cc -o tsubomi_mkii
-tsubomi_iiss: $(HDR) tsubomi_iiss.cc
-	g++ -O2 -Wall -g tsubomi_iiss.cc -o tsubomi_iiss
+tsubomi_mkii: $(HDR) tsubomi_indexer.cc tsubomi_mkii.cc
+	g++ -O2 -Wall -g tsubomi_indexer.cc tsubomi_mkii.cc -o tsubomi_mkii
+tsubomi_iiss: $(HDR) tsubomi_searcher.cc tsubomi_iiss.cc
+	g++ -O2 -Wall -g tsubomi_searcher.cc tsubomi_iiss.cc -o tsubomi_iiss
 
 libtsubomi: $(SRC) $(HDR)
 	g++ -O2 -Wall -fPIC -g -c tsubomi_indexer.cc
