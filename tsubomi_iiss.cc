@@ -44,27 +44,25 @@ int main(int argc, char **argv) {
 
     string labelname = string(textname) + ".label";
     searcher tbm(labelname.c_str());
-    char buf[1024];
-    bool ret = tbm.get_value(keyword, buf, 1024, "\n");
-    if (!ret) {
-      cout << "'" << keyword << "' not found." << endl;
-      clear_vertical_codes(vcs);
-      return 0;
-    }
+    sa_range r = tbm.search(keyword);
+    for (sa_index i = r.first; i <= r.second; i++) {
+      char buf[1024];
+      tbm.get_string(i, buf, 1024, "\n");
+      int i = 0;
+      while (buf[i] != ' ') { cout << buf[i]; i++; }
+      cout << buf[i];
+      i++;
+      ullong id = 0;
+      while ('0' <= buf[i] && buf[i] <= '9') {
+        id = id * 10 + (buf[i] - '0'); i++;
+      }
 
-    int i = 0;
-    while (buf[i] != ' ') { i++; }
-    i++;
-    ullong id = 0;
-    while ('0' <= buf[i] && buf[i] <= '9') {
-      id = id * 10 + (buf[i] - '0'); i++;
+      vertical_code *pvc = vcs[id];
+      for (ullong i = 0; i < pvc->size(); i++) {
+        cout << pvc->get(i) << " ";
+      }
+      cout << endl;
     }
-
-    vertical_code *pvc = vcs[id];
-    for (ullong i = 0; i < pvc->size(); i++) {
-      cout << pvc->get(i) << " ";
-    }
-    cout << endl;
     clear_vertical_codes(vcs);
   } catch (const char *err) {
     cerr << err << endl;
