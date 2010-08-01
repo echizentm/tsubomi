@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "tsubomi.h"
 #include "tsubomi_vertical_code.h"
 
 // tsubomi_iiss: tsubomi inverted index simple search
@@ -37,11 +38,29 @@ int main(int argc, char **argv) {
     }
 
     // search inverted index
-    string iiname = string(textname) + ".ii";
+    string indexname = string(textname) + ".index";
     vector<vertical_code *> vcs;
-    read_vertical_codes(iiname.c_str(), vcs);
-    ullong key_ull = atoi(keyword);
-    vertical_code *pvc = vcs[key_ull];
+    read_vertical_codes(indexname.c_str(), vcs);
+
+    string labelname = string(textname) + ".label";
+    searcher tbm(labelname.c_str());
+    char buf[1024];
+    bool ret = tbm.get_value(keyword, buf, 1024, "\n");
+    if (!ret) {
+      cout << "'" << keyword << "' not found." << endl;
+      clear_vertical_codes(vcs);
+      return 0;
+    }
+
+    int i = 0;
+    while (buf[i] != ' ') { i++; }
+    i++;
+    ullong id = 0;
+    while ('0' <= buf[i] && buf[i] <= '9') {
+      id = id * 10 + (buf[i] - '0'); i++;
+    }
+
+    vertical_code *pvc = vcs[id];
     for (ullong i = 0; i < pvc->size(); i++) {
       cout << pvc->get(i) << " ";
     }
