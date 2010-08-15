@@ -1,3 +1,4 @@
+CC  = /usr/bin/g++
 BIN = /usr/local/bin/
 LIB = /usr/local/lib/
 INC = /usr/local/include/
@@ -8,19 +9,19 @@ tsubomi: tsubomi_mkary tsubomi_sass tsubomi_mkii tsubomi_iiss libtsubomi
 win: tsubomi_mkary tsubomi_sass tsubomi_mkii tsubomi_iiss
 
 tsubomi_mkary: $(HDR) tsubomi_indexer.cc tsubomi_mkary.cc
-	g++ -O2 -Wall -g tsubomi_indexer.cc tsubomi_mkary.cc -o tsubomi_mkary
+	$(CC) -O2 -Wall -g tsubomi_indexer.cc tsubomi_mkary.cc -o tsubomi_mkary
 tsubomi_sass: $(HDR) tsubomi_searcher.cc tsubomi_sass.cc
-	g++ -O2 -Wall -g tsubomi_searcher.cc tsubomi_sass.cc -o tsubomi_sass
+	$(CC) -O2 -Wall -g tsubomi_searcher.cc tsubomi_sass.cc -o tsubomi_sass
 
 tsubomi_mkii: $(HDR) tsubomi_indexer.cc tsubomi_mkii.cc
-	g++ -O2 -Wall -g tsubomi_indexer.cc tsubomi_mkii.cc -o tsubomi_mkii
+	$(CC) -O2 -Wall -g tsubomi_indexer.cc tsubomi_mkii.cc -o tsubomi_mkii
 tsubomi_iiss: $(HDR) tsubomi_searcher.cc tsubomi_iiss.cc
-	g++ -O2 -Wall -g tsubomi_searcher.cc tsubomi_iiss.cc -o tsubomi_iiss
+	$(CC) -O2 -Wall -g tsubomi_searcher.cc tsubomi_iiss.cc -o tsubomi_iiss
 
 libtsubomi: $(SRC) $(HDR)
-	g++ -O2 -Wall -fPIC -g -c tsubomi_indexer.cc
-	g++ -O2 -Wall -fPIC -g -c tsubomi_searcher.cc
-	g++ -O2 -Wall -g -shared -Wl,-soname,libtsubomi.so.1 -o libtsubomi.so.1.0 tsubomi_indexer.o tsubomi_searcher.o
+	$(CC) -O2 -Wall -fPIC -g -c tsubomi_indexer.cc
+	$(CC) -O2 -Wall -fPIC -g -c tsubomi_searcher.cc
+	$(CC) -O2 -Wall -g -shared -Wl,-soname,libtsubomi.so.1 -o libtsubomi.so.1.0 tsubomi_indexer.o tsubomi_searcher.o
 	rm tsubomi_indexer.o
 	rm tsubomi_searcher.o
 
