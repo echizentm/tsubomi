@@ -70,27 +70,6 @@ namespace tsubomi {
   }
 
   ////////////////////////////////////////////////////////////////
-  class progress_bar {
-    int cur_;
-    int max_;
-    int star_;
-  public:
-    progress_bar(int max) : cur_(0), max_(max), star_(0) {}
-    ~progress_bar() {};
-    void progress(int num) {
-      this->cur_ += num;
-      if (this->cur_ >= this->max_) {
-        if (star_ < 40) { cerr << "*"; this->star_++; }
-        this->cur_ = 0;
-      }
-      return;
-    }
-  private:
-    progress_bar(const progress_bar &);
-    const progress_bar &operator=(const progress_bar &);
-  };
-
-  ////////////////////////////////////////////////////////////////
   // class indexer
   indexer::indexer(const char *filename)
    : filename_(filename), mr_file_(filename) {

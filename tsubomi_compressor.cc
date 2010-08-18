@@ -7,10 +7,15 @@
 namespace tsubomi {
   using namespace std;
 
-  void compressor::mkcsa() {
+  void compressor::mkcsa(const char *filename, bool is_progress) {
     mmap_reader<char>     mr_file(filename);
     mmap_reader<sa_index> mr_sa(string(filename) + ".ary");
     this->size_ = mr_sa.size();
+
+    progress_bar prg(this->size() / 40);
+    if (is_progress) {
+      cerr << "+--------------------------------------+" << endl;
+    }
 
     int      ch_prev    = 0;
     sa_index index_prev = 0;
@@ -37,12 +42,14 @@ namespace tsubomi {
       this->PSI_[ch].push(index - index_prev);
       index_prev = index;
       ch_prev    = ch;
+      if (is_progress) { prg.progress(1); }
     }
 
     this->PSIhead_.push(0);
     for (int ch = 0; i < 256; i++) {
       this->PSIhead_.push(this->PSI_[ch].size());
     }
+    if (is_progress) { cerr << endl << "done!" << endl; }
     return;
   }
 
