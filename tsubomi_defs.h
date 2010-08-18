@@ -2,6 +2,7 @@
 #ifndef TSUBOMI_DEFS
 #define TSUBOMI_DEFS
 #include <map>
+#include <iostream>
 
 namespace tsubomi {
   typedef int                           sa_index;
@@ -17,7 +18,7 @@ namespace tsubomi {
     void progress(int num) {
       this->cur_ += num;
       if (this->cur_ >= this->max_) {
-        if (star_ < 40) { cerr << "*"; this->star_++; }
+        if (star_ < 40) { std::cerr << "*"; this->star_++; }
         this->cur_ = 0;
       }
       return;

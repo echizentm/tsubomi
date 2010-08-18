@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
       return 0;
     }
 
-    tsubomi::compressor tbm();
+    tsubomi::compressor tbm;
     tbm.mkcsa(textname, is_progress);
     tbm.write(textname);
   } catch (const char *err) {

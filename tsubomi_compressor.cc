@@ -2,7 +2,7 @@
 #include "tsubomi_compressor.h"
 #include "tsubomi_mmap.h"
 #include <string>
-#inculde <iostream>
+#include <iostream>
 
 namespace tsubomi {
   using namespace std;
@@ -46,14 +46,14 @@ namespace tsubomi {
     }
 
     this->PSIhead_.push(0);
-    for (int ch = 0; i < 256; i++) {
+    for (int ch = 0; ch < 256; ch++) {
       this->PSIhead_.push(this->PSI_[ch].size());
     }
     if (is_progress) { cerr << endl << "done!" << endl; }
     return;
   }
 
-  inline compressor::size() {
+  inline sa_index compressor::size() {
     return this->size_;
   }
 
@@ -91,7 +91,7 @@ END:
   void compressor::read(const char *filename) {
     string csaname = string(filename) + ".csa";
     ifstream ifs;
-    ifs.open(csaname, ios::in | ios::binary);
+    ifs.open(csaname.c_str(), ios::in | ios::binary);
     if (!ifs) {
       throw "error at compressor::read(). file cannot open for read.";
     }
@@ -112,7 +112,7 @@ END:
   void compressor::write(const char *filename) {
     string csaname = string(filename) + ".csa";
     ofstream ofs;
-    ofs.open(csaname, ios::out | ios::binary | ios::trunc);
+    ofs.open(csaname.c_str(), ios::out | ios::binary | ios::trunc);
     if (!ofs) { 
       throw "error at compressor::write(). file cannot open for write."; 
     }

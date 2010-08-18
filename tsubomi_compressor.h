@@ -11,7 +11,7 @@ namespace tsubomi {
     ~compressor(){}
     void mkcsa(const char *filename, bool is_progress = false);
     sa_index size();
-    sa_range search(const charn *key);
+    sa_range search(const char *key);
     sa_index get_suffix(sa_index pos, char *buf,
                         sa_index size, const char *seps);
     void read(const char *filename);
