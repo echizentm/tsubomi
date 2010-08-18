@@ -120,9 +120,27 @@ namespace tsubomi {
         }
       } else {
         for (uint i = begin; i < end; i++) {
-          value += (this->popcount64((this->V_[i] & ((1ULL << q) - 1)))
+          value += (this->popcount64((this->V_[i] & ((1ULL << q) - 1ULL)))
                     << (i - begin));
         }
+      }
+      return value;
+    }
+
+    ullong diff(ullong pos) {
+      if (pos < 0 || this->size_ <= pos) {
+        throw "error at vertical_code::diff(). pos is out of range.";
+      }
+
+      ullong p     = pos / this->block_size_;
+      ullong q     = (pos % this->block_size_) + 1ULL;
+      uint   begin = this->cMSB_[p];
+      uint   end   = this->cMSB_[p + 1];
+
+      ullong value = 0;
+      for (uint i = begin; i < end; i++) {
+        value += (((this->V_[i] & ((1ULL << (q - 1ULL))) >> (q - 1ULL))
+                  << (i - begin));
       }
       return value;
     }
@@ -138,26 +156,26 @@ namespace tsubomi {
 
       this->cMSB_.clear();
       while(1) {
+        if (this->cMSB_.size() >= block_num) { break; }
         ifs.read((char *)&buf_ui, sizeof(uint));
         if (ifs.eof()) { return false; }
         this->cMSB_.push_back(buf_ui);
-        if (this->cMSB_.size() >= block_num) { break; }
       }
 
       this->base_.clear();
       while(1) {
+        if (this->base_.size() >= block_num) { break; }
         ifs.read((char *)&buf_ull, sizeof(ullong));
         if (ifs.eof()) { return false; }
         this->base_.push_back(buf_ull);
-        if (this->base_.size() >= block_num) { break; }
       }
 
       this->V_.clear();
       while(1) {
+        if (this->V_.size() >= *(this->cMSB_.rbegin())) { break; }
         ifs.read((char *)&buf_ull, sizeof(ullong));
         if (ifs.eof()) { return false; }
         this->V_.push_back(buf_ull);
-        if (this->V_.size() >= *(this->cMSB_.rbegin())) { break; }
       }
       return true;
     }
