@@ -5,8 +5,6 @@
 #include "tsubomi_vertical_code.h"
 
 namespace tsubomi {
-  class progress_bar;
-
   class compressor {
   public:
     compressor(){}

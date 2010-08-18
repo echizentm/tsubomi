@@ -6,8 +6,6 @@
 #include <vector>
 
 namespace tsubomi {
-  class progress_bar;
-
   class indexer {
   public:
     indexer(const char *filename);
