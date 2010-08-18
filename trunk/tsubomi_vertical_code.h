@@ -139,7 +139,7 @@ namespace tsubomi {
 
       ullong value = 0;
       for (uint i = begin; i < end; i++) {
-        value += (((this->V_[i] & ((1ULL << (q - 1ULL))) >> (q - 1ULL))
+        value += (((this->V_[i] & (1ULL << (q - 1ULL))) >> (q - 1ULL))
                   << (i - begin));
       }
       return value;

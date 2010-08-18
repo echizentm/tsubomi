@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
     }
 
     // search matched strings
-    tsubomi::compressor tbm();
+    tsubomi::compressor tbm;
     tbm.read(textname);
 
     string keyword_str = keyword;
