@@ -9,7 +9,6 @@ int main(int argc, char **argv) {
   try {
    // read command line parameters
     const char *textname = "";
-    const char *seps     = "";
     bool is_help         = false;
     bool is_progress     = false;
     char param           = '\0';
@@ -38,7 +37,7 @@ int main(int argc, char **argv) {
     }
 
     tsubomi::compressor tbm;
-    tbm.mkcsa(textname, is_progress);
+    tbm.mkcsa(textname, 100, is_progress);
     tbm.write(textname);
   } catch (const char *err) {
     cerr << err << endl;

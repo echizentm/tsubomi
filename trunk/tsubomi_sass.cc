@@ -1,7 +1,7 @@
 // $Id$
 #include <iostream>
 #include <string>
-#include "tsubomi.h"
+#include "tsubomi_basic_searcher.h"
 
 using namespace std;
 
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
     }
 
     // search matched strings
-    tsubomi::searcher tbm(textname);
+    tsubomi::basic_searcher tbm(textname);
 
     string keyword_str = keyword;
     if (is_key) { keyword_str += "\t"; }

@@ -3,25 +3,54 @@
 #include "tsubomi_mmap.h"
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 namespace tsubomi {
   using namespace std;
 
-  void compressor::mkcsa(const char *filename, bool is_progress) {
+  class lesser_invS {
+  public:
+    bool operator()(const pair<sa_index, sa_index>& left,
+                    const pair<sa_index, sa_index>& right) {
+      return left.second < right.second;
+    }
+  };
+
+  compressor::compressor(const char *filename) {
+    this->read(filename);
+    return;
+  }
+
+  void compressor::mkcsa(const char *filename, sa_index step,
+                         bool is_progress) {
     mmap_reader<char>     mr_file(filename);
     mmap_reader<sa_index> mr_sa(string(filename) + ".ary");
     this->size_ = mr_sa.size();
+    this->step_ = step;
 
     progress_bar prg(this->size() / 40);
     if (is_progress) {
       cerr << "+--------------------------------------+" << endl;
     }
 
+    // invB
+    this->invB_.push(1);
+    for (sa_index sa = 0; sa < this->size(); sa++) {
+      if (mr_file[sa] == '\n') { this->invB_.push(1); }
+      else                     { this->invB_.push(0); }
+    }
+
+    // others
     int      ch_prev    = 0;
     sa_index index_prev = 0;
     sa_index index      = 0;
+    vector<pair<sa_index, sa_index> > invStmp;
     for (sa_index i = 0; i < this->size(); i++) {
-      sa_index sa      = mr_sa[i];
+      sa_index sa = mr_sa[i];
+      if (sa == 0 || mr_file[sa - 1] == '\n') {
+        invStmp.push_back(pair<sa_index, sa_index>(i, sa));
+      }
+
       int      ch      = mr_file[sa] + 128;
       int      ch_diff = ch - ch_prev;
       if (ch_diff < 0) { throw "error at compressor::mkcsa(). ch_diff < 0."; }
@@ -37,17 +66,39 @@ namespace tsubomi {
             throw "error at compressor::mkcsa(). index is out of range.";
           }
         }
+        index++;
       }
-      index++;
       this->PSI_[ch].push(index - index_prev);
       index_prev = index;
       ch_prev    = ch;
+
+      // sample of SA
+      if (sa == (mr_sa.size() - 1)) {
+        // last_sa
+        this->B_.push(1);
+        this->S_.push(0);
+      } else if ((sa % this->step_) != 0) {
+        // not sample
+        this->B_.push(0);
+      } else {
+        // sample
+        this->B_.push(1);
+        this->S_.push(sa / this->step_ + 1);
+      }
       if (is_progress) { prg.progress(1); }
     }
 
     this->PSIhead_.push(0);
     for (int ch = 0; ch < 256; ch++) {
       this->PSIhead_.push(this->PSI_[ch].size());
+    }
+
+    // invS
+    sort(invStmp.begin(), invStmp.end(), lesser_invS());
+    vector<pair<sa_index, sa_index> >::iterator it = invStmp.begin();
+    while (it != invStmp.end()) {
+      this->invS_.push(it->first);
+      it++;
     }
     if (is_progress) { cerr << endl << "done!" << endl; }
     return;
@@ -72,20 +123,16 @@ namespace tsubomi {
     return pair<sa_index, sa_index>(begin2 + 1, end2 - 1);
   }
 
-  sa_index compressor::get_suffix(sa_index pos, char *buf, sa_index size, 
-                                  const char *seps) {
-    sa_index i = 0;
-    while (i < (size - 1)) {
-      pos = get_next(pos, buf + i);
-      for (int j = 0; seps[j] != '\0'; j++) {
-        if (buf[i] == seps[j]) { goto END; }
-      }
-      i++;
-      if (pos == -1) { break; }
+  bool compressor::get_line(sa_index pos, char *buf, sa_index size,
+                            sa_index *pkeypos) {
+    sa_index sa   = this->get_sa(pos);
+    sa_index i    = this->invB_.get(sa) - 1;
+    sa_index pos2 = this->invS_.diff(i);
+    if (pkeypos) {
+      sa_index sa2 = this->get_sa(pos2);
+      *pkeypos = (sa - sa2);
     }
-END:
-    buf[i] = '\0';
-    return pos;
+    return this->get_suffix(pos2, buf, size);
   }
 
   void compressor::read(const char *filename) {
@@ -97,6 +144,11 @@ END:
     }
 
     ifs.read((char *)&(this->size_), sizeof(sa_index));
+    ifs.read((char *)&(this->step_), sizeof(sa_index));
+    if(!(this->B_.read(ifs))) { goto END; }
+    if(!(this->S_.read(ifs))) { goto END; }
+    if(!(this->invB_.read(ifs))) { goto END; }
+    if(!(this->invS_.read(ifs))) { goto END; }
     if(!(this->pos2ch_.read(ifs))) { goto END; }
     if(!(this->PSIhead_.read(ifs))) { goto END; }
     for (int ch = 0; ch < 256; ch++) {
@@ -118,6 +170,11 @@ END:
     }
 
     ofs.write((char *)&(this->size_), sizeof(sa_index));
+    ofs.write((char *)&(this->step_), sizeof(sa_index));
+    this->B_.write(ofs);
+    this->S_.write(ofs);
+    this->invB_.write(ofs);
+    this->invS_.write(ofs);
     this->pos2ch_.write(ofs);
     this->PSIhead_.write(ofs);
     for (int ch = 0; ch < 256; ch++) {
@@ -125,6 +182,38 @@ END:
     }
     ofs.close();
     return;
+  }
+
+  bool compressor::get_suffix(sa_index pos, char *buf, sa_index size) {
+    sa_index i   = 0;
+    bool     ret = false;
+    while (i < (size - 1)) {
+      pos = get_next(pos, buf + i);
+      if (buf[i] == '\n') { ret = true; break; }
+      i++;
+      if (pos == -1) { ret = true; break; }
+    }
+    buf[i] = '\0';
+    return ret;
+  }
+
+  sa_index compressor::get_sa(sa_index pos) {
+    if (pos < 0 && this->size() <= pos) {
+      throw "error at compressor::get_sa(). pos is out if range.";
+    }
+
+    // move to sample index
+    sa_index d = 0;
+    while (this->B_.diff(pos) == 0) {
+      d++;
+      pos = this->get_next(pos);
+    }
+    // get suffix array
+    sa_index si = this->B_.get(pos) - 1;
+    sa_index sa = this->S_.diff(si);
+    if (sa == 0) { sa = this->size() - 1 - d; }
+    else         { sa = ((sa - 1) * this->step_) - d; }
+    return sa;
   }
 
   sa_index compressor::get_next(sa_index pos, char *pch) {

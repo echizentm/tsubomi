@@ -1,6 +1,6 @@
 // $Id$
 #include <iostream>
-#include "tsubomi.h"
+#include "tsubomi_indexer.h"
 
 using namespace std;
 

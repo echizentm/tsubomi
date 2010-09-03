@@ -27,7 +27,6 @@ namespace tsubomi {
     progress_bar(const progress_bar &);
     const progress_bar &operator=(const progress_bar &);
   };
-
 }
 
 #endif
