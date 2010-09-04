@@ -1,6 +1,7 @@
 // $Id$
 #include <iostream>
 #include <string>
+#include <cstring>
 #include "tsubomi_basic_searcher.h"
 #include "tsubomi_compressor.h"
 
