@@ -41,17 +41,17 @@ int main(int argc, char **argv) {
 
     // write helo message and exit
     if (textname[0] == '\0' || is_help) {
-      cout << "[USAGE] tsubomi_mkary [params] textfile" << endl;
-      cout << "[OPTIONS]" << endl;
-      cout << "  l   : index for each line." << endl;
-      cout << "  w   : index for each word." << 
+      cerr << "[USAGE] tsubomi_mkary [params] textfile" << endl;
+      cerr << "[OPTIONS]" << endl;
+      cerr << "  l   : index for each line." << endl;
+      cerr << "  w   : index for each word." << 
                       "(word is separated by \" \\t\\n\")" << endl;
-      cout << "  t(s): index for pointer after separators (s)." << endl;
-      cout << "  u   : index for each utf8 character." << endl;
-      cout << "  m   : make-onky mode. make unsorted \"*.ary\"." << endl;
-      cout << "  s   : sort-only mode. make suffix array from unsorted \"*.ary\"." << endl;
-      cout << "  p   : print progress bar while making suffix array." << endl;
-      cout << "  h   : print help message." << endl;
+      cerr << "  t(s): index for pointer after separators (s)." << endl;
+      cerr << "  u   : index for each utf8 character." << endl;
+      cerr << "  m   : make-onky mode. make unsorted \"*.ary\"." << endl;
+      cerr << "  s   : sort-only mode. make suffix array from unsorted \"*.ary\"." << endl;
+      cerr << "  p   : print progress bar while making suffix array." << endl;
+      cerr << "  h   : print help message." << endl;
       return 0;
     }
 
@@ -69,3 +69,4 @@ int main(int argc, char **argv) {
   }
   return 0;
 }
+

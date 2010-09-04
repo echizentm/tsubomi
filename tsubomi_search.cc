@@ -8,6 +8,20 @@ using namespace std;
 using namespace tsubomi;
 
 // tsubomi_search: tsubomi search
+
+void print_result(searcher *ptbm, const char *keyword) {
+  sa_range p = ptbm->search(keyword);
+  if (p.first < 0) { return; }
+
+  for (sa_index i = p.first; i <= p.second; i++) {
+    char     buf[1024];
+    sa_index pos;
+    ptbm->get_line(i, buf, 1024, &pos);
+    cout << buf << " : " << pos << endl;
+  }
+  return;
+}
+
 int main(int argc, char **argv) {
  try {
     // read command line parameters
@@ -36,12 +50,12 @@ int main(int argc, char **argv) {
     }
 
     // write help message and exit
-    if (keyword[0] == '\0' || is_help) {
-      cout << "[USAGE] tsubomi_csass [params] textfile keyword" << endl;
-      cout << "[OPTIONS]" << endl;
-      cout << "  c   : compressed suffix array mode." << endl;
-      cout << "        use not *.ary, but*.csa" << endl;
-      cout << "  h   : print help message." << endl;
+    if (textname[0] == '\0' || is_help) {
+      cerr << "[USAGE] tsubomi_csass [params] textfile keyword" << endl;
+      cerr << "[OPTIONS]" << endl;
+      cerr << "  c   : compressed suffix array mode." << endl;
+      cerr << "        use not *.ary, but*.csa" << endl;
+      cerr << "  h   : print help message." << endl;
       return 0;
     }
 
@@ -50,14 +64,15 @@ int main(int argc, char **argv) {
     if (is_csa) { ptbm = new compressor(textname); }
     else        { ptbm = new basic_searcher(textname); }
 
-    sa_range p = ptbm->search(keyword);
-    if (p.first < 0) { return 0; }
-
-    for (sa_index i = p.first; i <= p.second; i++) {
-      char     buf[1024];
-      sa_index pos;
-      ptbm->get_line(i, buf, 1024, &pos);
-      cout << buf << "(" << pos << ")" << endl;
+    if (keyword[0] != '\0') {
+      print_result(ptbm, keyword);
+    } else {
+      char buf[1024];
+      while (fgets(buf, 1024, stdin)) {
+        buf[strlen(buf) - 1] = '\0';
+        print_result(ptbm, buf);
+        cout << endl;
+      }
     }
   } catch (const char *err) {
     cerr << err << endl;
