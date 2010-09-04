@@ -8,10 +8,11 @@ using namespace std;
 int main(int argc, char **argv) {
   try {
    // read command line parameters
-    const char *textname = "";
-    bool is_help         = false;
-    bool is_progress     = false;
-    char param           = '\0';
+    const char *textname   = "";
+    sa_index   step        = 100;
+    bool       is_help     = false;
+    bool       is_progress = false;
+    char       param       = '\0';
     for (int i = 1; i < argc; i++) {
       if (argv[i][0] == '-') {
         if (argv[i][1] == '\0') { continue; }
@@ -21,6 +22,9 @@ int main(int argc, char **argv) {
           default : param       = argv[i][1]; break;
         }
       } else if (param) {
+        switch (param) {
+          case 's': step = atoi(argv[i]); break;
+        }
         param = '\0';
       } else {
         textname = argv[i];
@@ -29,15 +33,17 @@ int main(int argc, char **argv) {
 
     // write help message and exit
     if (textname[0] == '\0' || is_help) {
-      cout << "[USAGE] tsubomi_mkcsa [params] textfile" << endl;
-      cout << "[OPTIONS]" << endl;
-      cout << "  p   : print progress bar while making suffix array." << endl;
-      cout << "  h   : print help message." << endl;
+      cerr << "[USAGE] tsubomi_mkcsa [params] textfile" << endl;
+      cerr << "[OPTIONS]" << endl;
+      cerr << "  s   : sampling rate of suffix array." << endl;
+      cerr << "        if rate is big, *.csa is small but search time is slow." << endl;
+      cerr << "  p   : print progress bar while making suffix array." << endl;
+      cerr << "  h   : print help message." << endl;
       return 0;
     }
 
     tsubomi::compressor tbm;
-    tbm.mkcsa(textname, 100, is_progress);
+    tbm.mkcsa(textname, step, is_progress);
     tbm.write(textname);
   } catch (const char *err) {
     cerr << err << endl;
