@@ -1,8 +1,11 @@
 // $Id$
 #include <iostream>
+#include <cstdio>
+#include <cstdlib>
 #include "tsubomi_compressor.h"
 
 using namespace std;
+using namespace tsubomi;
 
 // tsubomi_mkcsa: tsubomi make compressed suffix array
 int main(int argc, char **argv) {
@@ -42,7 +45,7 @@ int main(int argc, char **argv) {
       return 0;
     }
 
-    tsubomi::compressor tbm;
+    compressor tbm;
     tbm.mkcsa(textname, step, is_progress);
     tbm.write(textname);
   } catch (const char *err) {
