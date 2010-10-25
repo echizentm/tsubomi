@@ -4,9 +4,10 @@ LIB = /usr/local/lib/
 INC = /usr/local/include/
 SRC = tsubomi_indexer.cc tsubomi_basic_searcher.cc tsubomi_compressor.cc
 HDR = tsubomi_vertical_code.h tsubomi_indexer.h tsubomi_searcher.h tsubomi_basic_searcher.h tsubomi_compressor.h tsubomi_mmap.h tsubomi_defs.h
+UNAME = $(shell uname)
 
 tsubomi: tsubomi_mkary tsubomi_mkcsa tsubomi_search libtsubomi
-win: tsubomi_mkary tsubomi_mkcsa tsubomi_search
+tools: tsubomi_mkary tsubomi_mkcsa tsubomi_search
 
 tsubomi_mkary: $(HDR) tsubomi_indexer.cc tsubomi_mkary.cc
 	$(CC) -O2 -Wall -g tsubomi_indexer.cc tsubomi_mkary.cc -o tsubomi_mkary
@@ -32,8 +33,14 @@ clean:
 
 install: tsubomi
 	cp libtsubomi.so.1.0 $(LIB)
+ifeq ($(UNAME), Linux)
 	/sbin/ldconfig -n $(LIB)
 	ln -fs $(LIB)libtsubomi.so.1 $(LIB)libtsubomi.so
+else
+	ln -fs $(LIB)libtsubomi.so.1.0 $(LIB)libtsubomi.so.1
+	/sbin/ldconfig -m $(LIB)
+	ln -fs $(LIB)libtsubomi.so.1 $(LIB)libtsubomi.so
+endif
 	cp tsubomi_mkary $(BIN)
 	cp tsubomi_mkcsa $(BIN)
 	cp tsubomi_search $(BIN)
