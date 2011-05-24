@@ -77,7 +77,6 @@ namespace erika {
         if (ia >= ea) { return; }
         pos = ia;
       }
-std::cout << "X pos: " << pos << std::endl;
       this->retrieve(pos, key, values);
       return;
     }
