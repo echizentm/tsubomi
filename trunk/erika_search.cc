@@ -17,13 +17,12 @@ int main(int argc, char **argv) {
       pt = new basic_trie();
     }
     pt->read(filename);
-    cerr << "> ";
+    cout << "> ";
 
 
     char *buf = NULL;
     size_t len = 0;
     while (getline(&buf, &len, stdin) != -1) {
-      cerr << "> ";
       buf[strlen(buf) - 1] = '\0';
       trie_results values;
       pt->search(buf, values);
