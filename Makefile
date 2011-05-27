@@ -6,14 +6,14 @@ SRC = tsubomi_indexer.cc tsubomi_basic_searcher.cc tsubomi_compressor.cc
 HDR = tsubomi_vertical_code.h tsubomi_indexer.h tsubomi_searcher.h tsubomi_basic_searcher.h tsubomi_compressor.h tsubomi_mmap.h tsubomi_defs.h
 UNAME = $(shell uname)
 
+tsubomi: tsubomi_mkary tsubomi_mkcsa tsubomi_search libtsubomi
+tools: tsubomi_mkary tsubomi_mkcsa tsubomi_search
+
 erika: erika_mktrie erika_search
 erika_mktrie: tsubomi_vertical_code.h erika_basic_trie.h erika_louds_trie.h
 	$(CC) -O2 -Wall -g erika_mktrie.cc -o erika_mktrie
 erika_search: tsubomi_vertical_code.h erika_basic_trie.h erika_louds_trie.h
 	$(CC) -O2 -Wall -g erika_search.cc -o erika_search
-
-tsubomi: tsubomi_mkary tsubomi_mkcsa tsubomi_search libtsubomi
-tools: tsubomi_mkary tsubomi_mkcsa tsubomi_search
 
 tsubomi_mkary: $(HDR) tsubomi_indexer.cc tsubomi_mkary.cc
 	$(CC) -O2 -Wall -g tsubomi_indexer.cc tsubomi_mkary.cc -o tsubomi_mkary
