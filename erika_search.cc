@@ -11,6 +11,7 @@ int main(int argc, char **argv) {
   try {
     trie *pt;
     char *filename = argv[1];
+    int  depth = atoi(argv[2]);
     if (filename[strlen(filename) - 2] == 'l') {
       pt = new louds_trie();
     } else {
@@ -25,7 +26,7 @@ int main(int argc, char **argv) {
     while (getline(&buf, &len, stdin) != -1) {
       buf[strlen(buf) - 1] = '\0';
       trie_results values;
-      pt->search(buf, values);
+      pt->search(buf, values, depth);
       trie_results::iterator i = values.begin();
       trie_results::iterator e = values.end();
       while (i != e) {

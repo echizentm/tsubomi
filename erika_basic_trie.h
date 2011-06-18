@@ -43,7 +43,8 @@ namespace erika {
   class trie {
   public:
     virtual ~trie() {}
-    virtual void search(const std::string &key, trie_results &values) = 0;
+    virtual void search(const std::string &key, trie_results &values,
+                        int depth = -1) = 0;
     virtual bool read(std::ifstream &ifs) = 0;
     virtual bool read(const char *filename) = 0;
     virtual void write(std::ofstream &ofs) = 0;
@@ -57,15 +58,18 @@ namespace erika {
     basic_trie(const basic_trie &);
     const basic_trie operator=(const basic_trie &);
 
-    void retrieve(int pos, const std::string &key, trie_results &values) {
+    void retrieve(int pos, const std::string &key, trie_results &values,
+                  int depth) {
       std::vector<int>::iterator ia = this->g_[pos].a_.begin();
       std::vector<int>::iterator ea = this->g_[pos].a_.end();
       while (ia != ea) {
         node &n = this->g_[*ia].n_;
         if(n.is_value_) {
           values.push_back(trie_result(key, n.label_));
-        } else {
-          this->retrieve(*ia, key + n.label_, values);
+        } else if (depth > 0) {
+          this->retrieve(*ia, key + n.label_, values, depth - 1);
+        } else if (depth == -1) {
+          this->retrieve(*ia, key + n.label_, values, depth);
         }
         ia++;
       }
@@ -120,7 +124,8 @@ namespace erika {
       }
       return;
     }
-    void search(const std::string &key, trie_results &values) {
+    void search(const std::string &key, trie_results &values,
+                int depth = -1) {
       values.clear();
       int pos  = 0;
       char d   = 0;
@@ -138,7 +143,7 @@ namespace erika {
         if (ia == ea) { return; }
         pos = *ia;
       }
-      this->retrieve(pos, key, values);
+      this->retrieve(pos, key, values, depth);
       return;
     }
 
