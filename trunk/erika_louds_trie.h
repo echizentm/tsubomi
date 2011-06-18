@@ -12,15 +12,18 @@ namespace erika {
     louds_trie(const louds_trie &);
     const louds_trie operator=(const louds_trie &);
 
-    void retrieve(int pos, const std::string &key, trie_results &values) {
+    void retrieve(int pos, const std::string &key, trie_results &values,
+                  int depth) {
       int ea = this->vc_.get(pos) + 1;
       int ia = ea - this->vc_.diff(pos);
       while (ia < ea) {
         node &n = this->nodes_[ia];
         if(n.is_value_) {
           values.push_back(trie_result(key, n.label_));
-        } else {
-          this->retrieve(ia, key + n.label_, values);
+        } else if (depth > 0) {
+          this->retrieve(ia, key + n.label_, values, depth - 1);
+        } else if (depth == -1) {
+          this->retrieve(ia, key + n.label_, values, depth);
         }
         ia++;
       }
@@ -59,7 +62,8 @@ namespace erika {
       }
       return;
     }
-    void search(const std::string &key, trie_results &values) {
+    void search(const std::string &key, trie_results &values,
+                int depth = -1) {
       values.clear();
       int pos  = 0;
       char d   = 0;
@@ -77,7 +81,7 @@ namespace erika {
         if (ia >= ea) { return; }
         pos = ia;
       }
-      this->retrieve(pos, key, values);
+      this->retrieve(pos, key, values, depth);
       return;
     }
 
