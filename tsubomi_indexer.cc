@@ -24,17 +24,6 @@ namespace tsubomi {
   };
 
   ////////////////////////////////////////////////////////////////
-  class writer {
-    FILE *fout_;
-  public:
-    writer(FILE *fout) : fout_(fout) {}
-    ~writer() {}
-    void write(vector<sa_index> &sa);
-  private:
-    writer(const writer &);
-    const writer &operator=(const writer &);
-  };
-
   void writer::write(vector<sa_index> &sa) {
     vector<sa_index>::iterator i = sa.begin();
     while (i != sa.end()) {
@@ -46,17 +35,6 @@ namespace tsubomi {
     }
     return;
   }
-
-  class reader {
-    FILE *fin_;
-  public:
-    reader(FILE *fin) : fin_(fin) {}
-    ~reader() {}
-    void read(vector<sa_index> &sa);
-  private:
-    reader(const reader &);
-    const reader &operator=(const reader &);
-  };
 
   void reader::read(vector<sa_index> &sa) {
     sa_index index;

@@ -17,7 +17,7 @@ namespace tsubomi {
     bool     get_line(sa_index pos, char *buf, sa_index size,
                       sa_index *pkeypos = NULL);
 
-  private:
+  protected:
     mmap_reader<char>     mr_file_;
     mmap_reader<sa_index> mr_sa_;
 
