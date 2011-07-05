@@ -20,7 +20,7 @@ namespace tsubomi {
     void read(const char *filename);
     void write(const char *filename);
 
-  private:
+  protected:
     vertical_code PSI_[256];
     vertical_code B_;
     vertical_code S_;
