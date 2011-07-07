@@ -10,22 +10,23 @@ namespace tsubomi {
 
   public:
     basic_searcher(const char *filename);
-    ~basic_searcher();
+    virtual ~basic_searcher();
 
-    sa_range search(const char *key);
-    sa_range search(const char *key, sa_index begin, sa_index end);
-    bool     get_line(sa_index pos, char *buf, sa_index size,
-                      sa_index *pkeypos = NULL);
+    virtual sa_range search(const char *key);
+    virtual sa_range search(const char *key, sa_index begin, sa_index end);
+    virtual bool     get_line(sa_index pos, char *buf, sa_index size,
+                              sa_index *pkeypos = NULL);
 
   protected:
     mmap_reader<char>     mr_file_;
     mmap_reader<sa_index> mr_sa_;
 
+    virtual int compare2key(sa_index offset, const char *key);
+    virtual sa_index binary_search(const char *key, sa_index begin, sa_index end);
+
+  private:
     basic_searcher(const basic_searcher &);
     const basic_searcher &operator=(const basic_searcher &);
-
-    int compare2key(sa_index offset, const char *key);
-    sa_index binary_search(const char *key, sa_index begin, sa_index end);
   };
 }
 
