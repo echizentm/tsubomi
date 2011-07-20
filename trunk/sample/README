@@ -1,0 +1,19 @@
+# before using futaba_match
+$$ cd ../tsubomi
+$$ gmake
+$$ sudo gmake install
+$$ cd sample
+$$ gmake
+
+
+# data format
+see var/color.txt
+
+
+# make index
+$$ tsubomi_mkary -l var/color.txt
+
+
+# use futaba_match
+$$ futaba_match var/color.tfidf < color.txt
+
