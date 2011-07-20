@@ -48,12 +48,14 @@ install: tsubomi
 ifeq ($(UNAME), Linux)
 	/sbin/ldconfig -n $(LIB)
 	ln -fs $(LIB)libtsubomi.so.1 $(LIB)libtsubomi.so
-elif ($(UNAME), Darwin)
+else
+ifeq ($(UNAME), Darwin)
 	ln -fs $(LIB)libtsubomi.so.1 $(LIB)libtsubomi.so
 else
 	ln -fs $(LIB)libtsubomi.so.1.0 $(LIB)libtsubomi.so.1
 	/sbin/ldconfig -m $(LIB)
 	ln -fs $(LIB)libtsubomi.so.1 $(LIB)libtsubomi.so
+endif
 endif
 	cp tsubomi_mkary $(BIN)
 	cp tsubomi_mkcsa $(BIN)
