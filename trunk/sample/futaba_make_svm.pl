@@ -34,16 +34,17 @@ my %ws;
 foreach my $c (@class_keys) {
   $ws{$c} = {};
 }
-while ($loop > 0) {
+my $r = 1;
+while ($r <= $loop) {
   foreach my $d (@data) {
     foreach my $c (@class_keys) {
       my $w = $ws{$c};
       my $t = -1;
       if ($d->[0] eq $c) { $t = 1; }
-      train($w, $d->[1], $t, $alpha);
+      train($w, $d->[1], $t, $alpha, 1 / $r);
     }
   }
-  $loop--;
+  $r++;
 }
 
 
@@ -88,12 +89,13 @@ sub train {
   my $x = shift;
   my $t = shift;
   my $a = shift;
+  my $r = shift;
 
   my $y = predict($w, $x);
   if ($y * $t < 1) {
     foreach my $f (keys %$x) {
       if (not $w->{$f}) { $w->{$f} = 0.0; }
-      $w->{$f} += (($t * $x->{$f}) - $a * $w->{$f});
+      $w->{$f} += ($r * (($t * $x->{$f}) - $a * $w->{$f}));
     }
   }
 }
