@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
-#use strict;
-#use warnings;
+use strict;
+use warnings;
 
 # read file, and calculate tf & idf
 my %tf;

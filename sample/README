@@ -11,11 +11,17 @@ $$ sudo gmake install
 see var/color.txt
 
 
-# make index
+# make index (weighted by tfidf)
 $$ futaba_make_tfidf var/color.txt > var/color.tfidf
 $$ tsubomi_mkary -l var/color.tfidf
 
 
+# make index (weighted by sgd-svm)
+$$ futaba_make_svm var/color.txt > var/color.svm
+$$ tsubomi_mkary -l var/color.svm
+
+
 # use futaba_match
 $$ futaba_match var/color.tfidf < var/color.txt
+if you'd like to use svm, change *.tfidf to *.svm
 
