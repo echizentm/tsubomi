@@ -4,6 +4,7 @@ $$ gmake
 $$ sudo gmake install
 $$ cd sample
 $$ gmake
+$$ sudo gmake install
 
 
 # data format
@@ -11,9 +12,10 @@ see var/color.txt
 
 
 # make index
-$$ tsubomi_mkary -l var/color.txt
+$$ futaba_make_tfidf var/color.txt > var/color.tfidf
+$$ tsubomi_mkary -l var/color.tfidf
 
 
 # use futaba_match
-$$ futaba_match var/color.tfidf < color.txt
+$$ futaba_match var/color.tfidf < var/color.txt
 

@@ -11,3 +11,11 @@ erika_match: futaba_match.cc
 clean:
 	- rm -f futaba_match
 
+install:
+	cp futaba_make_tfidf.pl $(BIN)
+	cp futaba_match $(BIN)
+
+uninstall:
+	- rm -f $(BIN)futaba_make_tfidf.pl
+	- rm -f $(BIN)futaba_match
+

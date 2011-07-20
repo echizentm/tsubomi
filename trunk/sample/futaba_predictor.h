@@ -42,7 +42,7 @@ namespace futaba {
     }
     ~predictor() {}
 
-    result_type predict(data &d, int n) {
+    result_type predict(data &d, unsigned int n) {
       vector_type::iterator i = d.v_.begin();
       vector_type::iterator e = d.v_.end();
       vector_type result;
