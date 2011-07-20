@@ -15,13 +15,15 @@ see var/color.txt
 $$ futaba_make_tfidf var/color.txt > var/color.tfidf
 $$ tsubomi_mkary -l var/color.tfidf
 
+# use futaba_match (weighted by tfidf)
+$$ futaba_match var/color.tfidf < var/color.txt
+
 
 # make index (weighted by sgd-svm)
 $$ futaba_make_svm var/color.txt > var/color.svm
 $$ tsubomi_mkary -l var/color.svm
 
+# use futaba_match (weighted by sgd-svm)
+$$ futaba_match var/color.svm < var/color.txt
 
-# use futaba_match
-$$ futaba_match var/color.tfidf < var/color.txt
-if you'd like to use svm, change *.tfidf to *.svm
 

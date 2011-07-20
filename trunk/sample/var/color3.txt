@@ -1,0 +1,8 @@
+warm:red	R:255,G:0,B:0,bias:1
+cold:green	R:0,G:255,B:0,bias:1
+cold:blue	R:0,G:0,B:255,bias:1
+cold:cyan	R:0,G:255,B:255,bias:1
+warm:magenta	R:255,G:0,B:255,bias:1
+warm:yellow	R:255,G:255,B:0,bias:1
+black:black	R:0,G:0,B:0,bias:1
+white:white	R:255,G:255,B:255,bias:1
