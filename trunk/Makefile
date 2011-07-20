@@ -26,7 +26,11 @@ libtsubomi: $(SRC) $(HDR)
 	$(CC) -O2 -Wall -fPIC -g -c tsubomi_indexer.cc
 	$(CC) -O2 -Wall -fPIC -g -c tsubomi_basic_searcher.cc
 	$(CC) -O2 -Wall -fPIC -g -c tsubomi_compressor.cc
+ifeq ($(UNAME), Darwin)
+	$(CC) -O2 -Wall -g -dynamiclib -Wl,-dylib_install_name,libtsubomi.so.1 -o libtsubomi.so.1.0 tsubomi_indexer.o tsubomi_basic_searcher.o tsubomi_compressor.o
+else
 	$(CC) -O2 -Wall -g -shared -Wl,-soname,libtsubomi.so.1 -o libtsubomi.so.1.0 tsubomi_indexer.o tsubomi_basic_searcher.o tsubomi_compressor.o
+endif
 	rm tsubomi_indexer.o
 	rm tsubomi_basic_searcher.o
 	rm tsubomi_compressor.o
@@ -43,6 +47,8 @@ install: tsubomi
 	cp libtsubomi.so.1.0 $(LIB)
 ifeq ($(UNAME), Linux)
 	/sbin/ldconfig -n $(LIB)
+	ln -fs $(LIB)libtsubomi.so.1 $(LIB)libtsubomi.so
+elif ($(UNAME), Darwin)
 	ln -fs $(LIB)libtsubomi.so.1 $(LIB)libtsubomi.so
 else
 	ln -fs $(LIB)libtsubomi.so.1.0 $(LIB)libtsubomi.so.1
