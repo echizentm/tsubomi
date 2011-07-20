@@ -34,7 +34,7 @@ foreach my $feature_key (keys %tf) {
   foreach my $class_key (keys %$fr) {
     my $tfidf = $fr->{$class_key} * $log_df;
     $class_norm{$class_key} += $tfidf;
-    $tfidf *= $log_df;
+#    $tfidf *= $log_df;
     $fr->{$class_key} = $tfidf;
   }
 }

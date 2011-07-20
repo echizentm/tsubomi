@@ -13,9 +13,11 @@ clean:
 
 install:
 	cp futaba_make_tfidf.pl $(BIN)
+	cp futaba_make_svm.pl $(BIN)
 	cp futaba_match $(BIN)
 
 uninstall:
 	- rm -f $(BIN)futaba_make_tfidf.pl
+	- rm -f $(BIN)futaba_make_svm.pl
 	- rm -f $(BIN)futaba_match
 
