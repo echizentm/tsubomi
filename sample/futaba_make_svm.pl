@@ -3,6 +3,12 @@ use strict;
 use warnings;
 use Data::Dumper;
 
+if (@ARGV < 2) {
+  die "[USAGE] futaba_make_svm.pl loop alpha < input.txt > output.svm\n".
+      "  loop : number of iteraitons.\n".
+      "  alpha: rate of regularization. (loss() + alpha * (|w|^2) / 2)\n";
+}
+
 my $loop  = shift @ARGV;
 my $alpha = shift @ARGV;
 
