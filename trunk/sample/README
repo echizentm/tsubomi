@@ -12,7 +12,7 @@ see var/color.txt
 
 
 # make index (weighted by tfidf)
-$$ futaba_make_tfidf var/color.txt > var/color.tfidf
+$$ futaba_make_tfidf < var/color.txt > var/color.tfidf
 $$ tsubomi_mkary -l var/color.tfidf
 
 # use futaba_match (weighted by tfidf)
@@ -20,7 +20,7 @@ $$ futaba_match var/color.tfidf < var/color.txt
 
 
 # make index (weighted by sgd-svm)
-$$ futaba_make_svm var/color.txt > var/color.svm
+$$ futaba_make_svm 10 0.1 < var/color.txt > var/color.svm
 $$ tsubomi_mkary -l var/color.svm
 
 # use futaba_match (weighted by sgd-svm)
