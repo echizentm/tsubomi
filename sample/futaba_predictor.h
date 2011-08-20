@@ -50,6 +50,7 @@ namespace futaba {
       while (i != e) {
         tsubomi::sa_range r = this->s_.search(i->first.c_str());
         if (r.first < 0) { i++; continue; }
+std::cerr << "feature: " << i->first << std::endl;
         for (tsubomi::sa_index j = r.first; j <= r.second; j++) {
           bool f = this->s_.get_line(j, buf, 65536);
           if (!f) { throw "error at predictor::predict(). buf is not enough."; }
@@ -57,6 +58,7 @@ namespace futaba {
           vector_type::iterator i2 = d2.v_.begin();
           vector_type::iterator e2 = d2.v_.end();
           while (i2 != e2) {
+std::cerr << "\t" << i2->first << std::endl;
             result[i2->first] += i->second * i2->second;
             i2++;
           }

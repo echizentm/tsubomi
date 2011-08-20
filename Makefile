@@ -50,6 +50,7 @@ ifeq ($(UNAME), Linux)
 	ln -fs $(LIB)libtsubomi.so.1 $(LIB)libtsubomi.so
 else
 ifeq ($(UNAME), Darwin)
+	ln -fs $(LIB)libtsubomi.so.1.0 $(LIB)libtsubomi.so.1
 	ln -fs $(LIB)libtsubomi.so.1 $(LIB)libtsubomi.so
 else
 	ln -fs $(LIB)libtsubomi.so.1.0 $(LIB)libtsubomi.so.1
