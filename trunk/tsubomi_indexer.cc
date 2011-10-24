@@ -153,6 +153,7 @@ namespace tsubomi {
         if (pprg) { pprg->progress(1); }
         if (b_ch == pivot) { swap(sa[a], sa[b]); a++; }
         b++;
+        if (b >= sa_index(sa.size())) { break; }
         b_offset = sa[b] + depth;
         b_ch     = -1000; // smaller than any char(-127...128)
         if (b_offset < this->mr_file_.size()) { b_ch = this->mr_file_[b_offset]; }
@@ -161,6 +162,7 @@ namespace tsubomi {
         if (pprg) { pprg->progress(1); }
         if (c_ch == pivot) { swap(sa[c], sa[d]); d--; }
         c--;
+        if (c < sa_index(0)) { break; }
         c_offset = sa[c] + depth;
         c_ch     = -1000; // smaller than any char(-127...128)
         if (c_offset < this->mr_file_.size()) { c_ch = this->mr_file_[c_offset]; }
