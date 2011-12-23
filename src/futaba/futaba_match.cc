@@ -8,7 +8,7 @@ using namespace std;
 using namespace futaba;
 int main(int argc, char **argv) {
   if (argc < 2) {
-    cerr << "[USAGE]: futaba *.tfidf [results] < input > output";
+    cerr << "[USAGE]: futaba *.tfidf(or *.svm) [results] < input > output" << endl;
     return 0;
   }
   int n = 10;
