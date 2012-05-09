@@ -44,7 +44,30 @@ namespace tsubomi {
     sa_index i = 0;
     while (i < (size - 1)) {
       buf[i] = this->mr_file_[sa++];
-      if (buf[i] == '\n') { ret = true; break; }
+      if (buf[i] == '\n' || buf[i] == '\0') { ret = true; break; }
+      i++;
+    }
+    buf[i] = '\0';
+    return ret;
+  }
+
+  bool basic_searcher::get_line(sa_index pos, string &buf,
+                                sa_index *pkeypos) {
+    if (pos < 0 || this->mr_sa_.size() <= pos) {
+      throw "error at searcher::get_line(). pos is out of range.";
+    }
+
+    sa_index sa = this->mr_sa_[pos];
+    sa_index tmp_sa = sa;
+    while (sa > 0 && this->mr_file_[sa - 1] != '\n') { sa--; }
+    if (pkeypos) { *pkeypos = (tmp_sa - sa); }
+
+    bool ret = false;
+    buf = "";
+    sa_index i = 0;
+    while (1) {
+      buf += this->mr_file_[sa++];
+      if (buf[i] == '\n' || buf[i] == '\0') { ret = true; break; }
       i++;
     }
     buf[i] = '\0';
