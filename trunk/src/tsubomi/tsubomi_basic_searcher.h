@@ -4,6 +4,7 @@
 #include "tsubomi_defs.h"
 #include "tsubomi_mmap.h"
 #include "tsubomi_searcher.h"
+#include <string>
 
 namespace tsubomi {
   class basic_searcher : public searcher {
@@ -15,6 +16,8 @@ namespace tsubomi {
     virtual sa_range search(const char *key);
     virtual sa_range search(const char *key, sa_index begin, sa_index end);
     virtual bool     get_line(sa_index pos, char *buf, sa_index size,
+                              sa_index *pkeypos = NULL);
+    virtual bool     get_line(sa_index pos, std::string &buf,
                               sa_index *pkeypos = NULL);
 
   protected:
