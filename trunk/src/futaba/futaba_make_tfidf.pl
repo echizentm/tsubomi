@@ -1,12 +1,14 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 use strict;
 use warnings;
 
 # read file, and calculate tf & idf
+warn "read file, and calculate tf & idf.\n";
 my %tf;
 my %df;
 my $N = 1;
 while (<>) {
+  warn "#$.\n" unless ($. % 10000);
   chomp;
   my @a = split(/\t/);
   if (@a != 2) { warn "#$. is invalid. ignored.\n"; next; }
@@ -25,6 +27,7 @@ while (<>) {
 
 
 # calculate tfidf & class norm
+warn "calculate tfidf & class norm.\n";
 my %class_norm;
 my $log_N = log($N);
 foreach my $feature_key (keys %tf) {
@@ -41,6 +44,7 @@ foreach my $feature_key (keys %tf) {
 
 
 # print normalized tf-idf
+warn "print normalized tf-idf.\n";
 foreach my $feature_key (keys %tf) {
   my $fr = $tf{$feature_key};
   print "$feature_key\t";
