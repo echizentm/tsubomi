@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Data::Dumper;
@@ -13,9 +13,11 @@ my $loop  = shift @ARGV;
 my $alpha = shift @ARGV;
 
 # read file, and set data
+warn "read file, and set data.\n";
 my @data;
 my %class_list;
 while (<>) {
+  warn "#$.\n" unless ($. % 10000);
   chomp;
   my @a = split(/\t/);
   if (@a != 2) { warn "#$. is invalid. ignored.\n"; next; }
@@ -35,6 +37,7 @@ while (<>) {
 
 
 # train weight by sgd-svm algorithm
+warn "train weight by sgd-svm algorithm.\n";
 my @class_keys = keys %class_list;
 my %ws;
 foreach my $c (@class_keys) {
@@ -42,6 +45,7 @@ foreach my $c (@class_keys) {
 }
 my $r = 1;
 while ($r <= $loop) {
+  warn "loop #$r\n";
   foreach my $d (@data) {
     foreach my $c (@class_keys) {
       my $w = $ws{$c};
@@ -55,6 +59,7 @@ while ($r <= $loop) {
 
 
 # invert weight
+warn "invert weight.\n";
 my %ii;
 foreach my $c (@class_keys) {
   my $w = $ws{$c};
@@ -65,6 +70,7 @@ foreach my $c (@class_keys) {
 
 
 # print weight
+warn "print weight.\n";
 foreach my $f (keys %ii) {
   print "$f\t";
   my $sep = '';
