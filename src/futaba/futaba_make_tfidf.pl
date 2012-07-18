@@ -36,8 +36,7 @@ foreach my $feature_key (keys %tf) {
   my $log_df = $log_N - log($df{$feature_key});
   foreach my $class_key (keys %$fr) {
     my $tfidf = $fr->{$class_key} * $log_df;
-    $class_norm{$class_key} += $tfidf;
-#    $tfidf *= $log_df;
+    $class_norm{$class_key} += ($tfidf * $tfidf);
     $fr->{$class_key} = $tfidf;
   }
 }
@@ -51,7 +50,7 @@ foreach my $feature_key (keys %tf) {
 
   my $sep    = '';
   foreach my $class_key (keys %$fr) {
-    my $normalized_tfidf = $fr->{$class_key} / $class_norm{$class_key};
+    my $normalized_tfidf = $fr->{$class_key} / sqrt($class_norm{$class_key});
     $normalized_tfidf = int($normalized_tfidf * 10000) / 10000;
     print "$sep$class_key:$normalized_tfidf";
     $sep = ',';
